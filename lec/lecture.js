@@ -218,9 +218,9 @@ const LECTURES = [
     summaryHtml:"챗GPT 창에 묻고 답하는 단계를 넘어, <br class=\"m\">내 컴퓨터 안에서 내 브랜드를 이해하고 <br class=\"m\">일하는 AI 를 4시간에 세팅합니다.<br class=\"pc\"> "
         + "<br class=\"m\">브랜드 코어 설계, 비주얼 프로덕션, <br class=\"m\">카카오톡 자동 보고까지 완성합니다. <br class=\"m\">정원 10명 · 수강료 10만&nbsp;원.",
     photos:[
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
     ],
     apply:{from:"2026-09-08", to:"2026-09-17"},
     pitch:{
@@ -848,9 +848,9 @@ const LECTURES = [
     summaryHtml:"디자이너 · 마케터 · 개발자의 일을 <br class=\"m\">함께할 AI 를, 내 브랜드를 이해하도록 <br class=\"m\">내 컴퓨터 안에 4시간에 세팅합니다.<br class=\"pc\"> "
         + "<br class=\"m\">브랜드 코어 설계, 비주얼 프로덕션, <br class=\"m\">카카오톡 자동 보고까지 완성합니다. <br class=\"m\">정원 10명 · 수강료 10만&nbsp;원.",
     photos:[
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
     ],
     apply:{from:"2026-10-11", to:"2026-10-27"},
     pitch:{
@@ -1914,5 +1914,67 @@ function fixApplyForm(){
 if(!fixApplyForm()){
   let ft = 0;
   const ftimer = setInterval(()=>{ if(fixApplyForm() || ++ft > 200) clearInterval(ftimer); }, 100);
+}
+
+/* ── 강의 히어로(다른 블록) 문구 — 2026-10-29 대표님: 모집 상황에 따라 스스로 바뀌게 (상시 문구 A안) ──
+   히어로 블록의 설정값은 '상시 문구'(모집 중인 강의가 없을 때)다. 지난 모집 안내가 남지 않게 기본을 상시로 둔다.
+   ① 지금 신청할 수 있는 강의(status open, 초청·컨설팅 제외)가 있으면 → 그 강의 문구 + 「신청하기」 한 단추.
+      강의 객체에 hero:{eyebrow,title,subtitle,chips:[3개],meta,cta} 를 적으면 그 값을, 없으면 강의 정보로 만든다.
+   ② 없으면 → 설정값 그대로 + 「다음 기수 알림 받기」·「기관 · 기업 강의 문의」 두 단추.
+      두 단추는 신청 폼의 늘 열린 항목('다음기수알림' · '강의문의')을 미리 골라 준다. */
+function heroSync(){
+  const host = document.querySelector(".lhx");
+  if(!host || !host.querySelector(".lhx-act .lhx-cta")) return false;
+  const act = host.querySelector(".lhx-act"), cta = act.querySelector(".lhx-cta");
+  const open = LECTURES.filter(l => l.status === "open" && !l.kind)
+                       .sort((a,b) => a.sessions[0].date < b.sessions[0].date ? -1 : 1)[0];
+  const key = open ? "open:" + open.id : "idle";
+  if(host.dataset.sbaHero !== key){
+    host.dataset.sbaHero = key;
+    let cta2 = act.querySelector(".lhx-cta2");
+    if(open){
+      const h = open.hero || {};
+      const name = open.title + (open.edition ? " " + open.edition : "");
+      const set = (sel, v, html) => { const el = host.querySelector(sel); if(el && v != null){ if(html) el.innerHTML = v; else el.textContent = v; } };
+      set(".lhx-eye", h.eyebrow || ("스몰브랜드설계자 · " + name + " 모집 중"));
+      const ti = host.querySelector(".lhx-title");
+      if(ti){ ti.textContent = h.title || open.title; ti.__cc = false; }   /* 히어로 스크립트가 '클로드 코드' 를 다시 감쌀 수 있게 */
+      set(".lhx-sub", h.subtitle || open.summary, true);
+      if(h.chips){ host.querySelectorAll(".lhx-chip").forEach((c,i) => { if(h.chips[i] != null){ const b = c.querySelector("b"); c.innerHTML = (b ? b.outerHTML : "") + esc(h.chips[i]); c.__cc = false; } }); }
+      const first = open.sessions[0];
+      set(".lhx-meta", h.meta || ("모집 ~ " + fmtw(open.apply.to) + " · 교육 " + (first ? fmtw(first.date) : "")));
+      cta.textContent = h.cta || (name + " 신청하기");
+      cta.removeAttribute("data-pick");
+      if(cta2) cta2.remove();
+    } else {
+      cta.setAttribute("data-pick", "다음기수알림");
+      if(!cta2){
+        cta2 = document.createElement("button");
+        cta2.className = "lhx-cta2"; cta2.setAttribute("data-go", "apply"); cta2.setAttribute("data-pick", "강의문의");
+        cta2.textContent = "기관 · 기업 강의 문의";
+        act.appendChild(cta2);
+      }
+    }
+  }
+  if(!host.__sbaPick){
+    host.__sbaPick = true;
+    host.addEventListener("click", e => {
+      const b = e.target.closest("[data-go=\"apply\"]");
+      if(!b) return;
+      /* 폼까지 내려가는 것은 히어로 스크립트가 [data-go="apply"] 로 해 준다 — 여기서는 항목만 고른다 */
+      const v = b.getAttribute("data-pick");
+      const sel = document.querySelector("#sba-apply select[name=\"program\"]");
+      if(!v || !sel) return;
+      const opt = Array.prototype.find.call(sel.options, o => o.value === v && !o.disabled);
+      if(!opt) return;
+      sel.value = v;
+      sel.dispatchEvent(new Event("change", {bubbles:true}));
+    });
+  }
+  return true;
+}
+if(!heroSync()){
+  let ht = 0;
+  const htimer = setInterval(()=>{ if(heroSync() || ++ht > 200) clearInterval(htimer); }, 100);
 }
 };

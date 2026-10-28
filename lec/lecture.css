@@ -116,7 +116,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
    글이 놓인 왼쪽·아래로는 마스크로 사라져 읽는 데 방해하지 않는다. */
 .slp .open-card::after{content:"";position:absolute;top:-34px;right:-46px;z-index:0;pointer-events:none;
   width:min(48%,440px);aspect-ratio:900/808;opacity:.16;
-  background:url("https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029a/lec-growth.webp") no-repeat center/contain;
+  background:url("https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/lec-growth.webp") no-repeat center/contain;
   -webkit-mask-image:linear-gradient(255deg,#000 44%,rgba(0,0,0,.35) 74%,transparent 96%);
           mask-image:linear-gradient(255deg,#000 44%,rgba(0,0,0,.35) 74%,transparent 96%);
   animation:sbaGrow 9s ease-in-out infinite alternate}
@@ -609,3 +609,9 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist .nm .cdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:var(--green)}
 .slp .st-mentor{background:#fff;color:var(--house);border:1.5px solid var(--green)}
 .slp .st-mentor::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--green)}
+
+/* 강의 히어로 두 번째 단추 — 모집 중인 강의가 없을 때 lecture.js 가 붙인다 (2026-10-29) */
+.lhx .lhx-act .lhx-cta2{display:inline-block;margin-left:12px;vertical-align:middle;background:transparent;color:#EAF3EE;font-family:inherit;font-size:15.5px;font-weight:800;padding:16px 26px;border:1.5px solid rgba(234,243,238,.45);border-radius:999px;cursor:pointer;transition:border-color .2s,background .2s,transform .22s cubic-bezier(.34,1.5,.64,1)}
+.lhx .lhx-act .lhx-cta2:hover{border-color:#7FE0BE;background:rgba(127,224,190,.08);transform:translateY(-3px)}
+@media (max-width:767px){.lhx .lhx-act .lhx-cta2{display:block;width:100%;margin:10px 0 0;padding:15px;border-radius:16px;font-size:15px}}
+@media (prefers-reduced-motion:reduce){.lhx .lhx-act .lhx-cta2{transition:none}}
