@@ -218,9 +218,9 @@ const LECTURES = [
     summaryHtml:"챗GPT 창에 묻고 답하는 단계를 넘어, <br class=\"m\">내 컴퓨터 안에서 내 브랜드를 이해하고 <br class=\"m\">일하는 AI 를 4시간에 세팅합니다.<br class=\"pc\"> "
         + "<br class=\"m\">브랜드 코어 설계, 비주얼 프로덕션, <br class=\"m\">카카오톡 자동 보고까지 완성합니다. <br class=\"m\">정원 10명 · 수강료 10만&nbsp;원.",
     photos:[
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
     ],
     apply:{from:"2026-09-08", to:"2026-09-17"},
     pitch:{
@@ -808,8 +808,8 @@ const LECTURES = [
   {
     id:"sju-genimg", title:"생성형 AI 이미지 만들기", edition:"",
     status:"auto", kind:"invite",
-    host:"상지대학교 창업보육센터 초청 특강",
-    summary:"상지대학교 창업보육센터에서 진행하는 생성형 AI 이미지 만들기 특강입니다. "
+    host:"AI강원 의뢰 · 상지대학교 창업교육센터 특강",
+    summary:"상지대학교 창업교육센터가 AI강원에 의뢰해 진행하는 생성형 AI 이미지 만들기 특강입니다. "
         + "상세페이지 · SNS · 홍보물에 쓸 이미지를 AI 로 직접 만들어 보는 법을 다룹니다. 홈페이지에서 따로 신청받지 않습니다.",
     sessions:[
       {date:"2026-11-25", n:1, title:"생성형 AI 로 내 사업에 쓸 이미지 만들기"}
@@ -820,8 +820,8 @@ const LECTURES = [
     reviews:[],
     detail:`
 ## 초청 특강입니다
-**상지대학교 창업보육센터** 요청으로 진행하는 특강입니다.
-홈페이지에서 신청받는 강의가 아니라, 초청을 받아 나가는 자리입니다.
+**상지대학교 창업교육센터**가 **AI강원**에 의뢰해 진행하는 특강입니다.
+홈페이지에서 신청받는 강의가 아니라, 의뢰를 받아 나가는 자리입니다.
 
 ## 무엇을 다루나
 - **생성형 AI 이미지 기초** — 원하는 그림이 나오도록 AI 에게 말하는 법
@@ -848,9 +848,9 @@ const LECTURES = [
     summaryHtml:"디자이너 · 마케터 · 개발자의 일을 <br class=\"m\">함께할 AI 를, 내 브랜드를 이해하도록 <br class=\"m\">내 컴퓨터 안에 4시간에 세팅합니다.<br class=\"pc\"> "
         + "<br class=\"m\">브랜드 코어 설계, 비주얼 프로덕션, <br class=\"m\">카카오톡 자동 보고까지 완성합니다. <br class=\"m\">정원 10명 · 수강료 10만&nbsp;원.",
     photos:[
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
-      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029b/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice1c.jpg", alt:"월 300만 원 정도 직원을 쓰는 듯한 느낌이에요 — 30대 후반 온라인 숍 사장님"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice2c.jpg", alt:"왜 작은 사업체 사장님들한테 클로드가 최고인지 알게 됐습니다 — 중년 남성 대표"},
+      {src:"https://fastly.jsdelivr.net/gh/kjgqppr9-cmyk/sba-site@s1029c/cc1-voice3c.jpg", alt:"클로드로 부업해서 돈 벌었다는 게 이제 이해됩니다 — 30대 디자인 프리랜서"}
     ],
     apply:{from:"2026-10-11", to:"2026-10-27"},
     pitch:{
