@@ -615,3 +615,31 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .lhx .lhx-act .lhx-cta2:hover{border-color:#7FE0BE;background:rgba(127,224,190,.08);transform:translateY(-3px)}
 @media (max-width:767px){.lhx .lhx-act .lhx-cta2{display:block;width:100%;margin:10px 0 0;padding:15px;border-radius:16px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){.lhx .lhx-act .lhx-cta2{transition:none}}
+
+/* 무료 · 초청 · 용역 강의 신청서 (커스텀 DB lecture-apply) — lecture.js sgShow (2026-10-30) */
+.slp .sg-tag{display:inline-flex;align-items:center;font-size:12.5px;font-weight:800;color:var(--green);background:var(--mint);border-radius:99px;padding:4px 10px;letter-spacing:-.01em}
+.slp .ov-box.sg-box{animation:none}
+.slp .sg-when{margin-top:6px;font-size:14.5px;font-weight:700;color:var(--ink2)}
+.slp .sg-msg{text-align:center;padding:18px 4px 6px}
+.slp .sg-msg h4{font-size:20px;font-weight:800;color:var(--green);letter-spacing:-.03em;margin:0 0 10px}
+.slp .sg-msg p{font-size:15.5px;line-height:1.75;margin:0 0 16px;color:var(--ink)}
+.slp .sg-msg p b{color:var(--green)}
+.slp .sg-help{display:block;font-style:normal;font-size:13px;line-height:1.6;color:var(--ink2);margin-top:6px}
+.slp .sg-form{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.slp .sg-f{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;min-width:0}
+.slp .sg-f>span{font-size:14.5px;font-weight:800;color:var(--house)}
+.slp .sg-f>span b{color:#C0392B}
+.slp .sg-f>span small{font-weight:600;color:var(--ink2);font-size:12.5px;margin-left:4px}
+.slp .sg-f input[type=text],.slp .sg-f input[type=tel]{font-family:inherit;font-size:16px;padding:13px 15px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);width:100%;box-sizing:border-box}
+.slp .sg-f input[type=text]:focus,.slp .sg-f input[type=tel]:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(0,98,65,.12)}
+.slp .sg-f input[type=file]{font-family:inherit;font-size:14px;width:100%;min-width:0;box-sizing:border-box}
+.slp .sg-ro{font-size:15.5px;font-weight:700;color:var(--ink);background:var(--cream);border-radius:12px;padding:12px 15px}
+.slp .sg-agree{background:var(--cream);border-radius:14px;padding:14px 16px}
+.slp .sg-agree label{display:flex;gap:9px;align-items:flex-start;font-size:15px;cursor:pointer;color:var(--house)}
+.slp .sg-agree input{width:20px;height:20px;flex:none;margin:1px 0 0;accent-color:var(--green)}
+.slp .sg-agree ul{margin:10px 0 0;padding-left:20px;font-size:13px;line-height:1.7;color:var(--ink2)}
+.slp .sg-err{min-height:1em;margin:0;font-size:14px;font-weight:700;color:#C0392B}
+.slp .sg-err:empty{display:none}
+.slp .sg-send[disabled]{opacity:.6;cursor:wait}
+.slp .af-kakao{background:#FFF8E1;border:2px solid #F2D27A;border-radius:16px;padding:14px 16px;margin:0 0 16px;font-size:14px;line-height:1.7;color:#5b4a12;text-align:center}
+.slp .af-kakao a{display:inline-block;margin-top:8px;background:#006241;color:#fff;font-weight:800;border-radius:999px;padding:9px 18px;text-decoration:none}

@@ -24,6 +24,13 @@ function q(sel){ const h = hostEl(); return h ? h.querySelector(sel) : null; }
    sessions 의 tag 는 회차 주제, do 는 그 시간에 손으로 만드는 것입니다.
 
    정원(capacity)은 화면에 안 보여 준다 — 남은 자리를 공개하면 눈치 게임이 된다.
+
+   signup 은 무료 · 초청 · 용역 강의를 이 페이지의 '신청서'(식스샵 커스텀 DB lecture-apply)로 받을 때만 적는다.
+     signup:{type:"free"|"invite"|"contract", from:"2026-11-01", to:"2026-11-20", host:"주관 기관(없으면 host)"}
+     · type = 무료 · 초청 · 용역 이름표. from 이 없으면 바로, to 가 없으면 첫 회차 날까지 받는다.
+     · 신청하기 단추가 아래 게시판 신청 폼 대신 신청서 창을 연다. 회원 로그인 뒤에만 낼 수 있다.
+     · 기관에 돌릴 주소: 강의 페이지 주소 끝에 #signup-<id> (예 …/cmpwyv9vbez2u01un64870ttq#signup-sju-genimg)
+     · paid:true(유료) 강의에는 적어도 무시한다 — 유료는 상품 주문으로 받는다.
    ══════════════════════════════════════════════════════════════ */
 const LECTURES = [
   {
@@ -975,6 +982,15 @@ const LECTURES = [
 
 const APPLY_ANCHOR = "sba-apply";
 const APPLY_FALLBACK = "/qna/form";
+/* 무료 · 초청 · 용역 신청서 설정 — 아래 「강의 신청서」 묶음에서 쓴다(boot 전에 있어야 한다) */
+const SG_API = "https://cdb.sixshop.io/my/lecture-apply";
+const SG_STORE = "sba01";
+const SG_TYPES = {free:"무료 강의", invite:"초청 강의", contract:"용역 강의"};
+const SG_KEEP = "강의가 끝난 날로부터 1년";          /* 개인정보 보유 기간 — 바꾸려면 이 한 줄만 */
+const SG_RESUME = "sba_lec_signup_resume";            /* 로그인하러 갔다 돌아오면 신청서를 이어서 연다 */
+const SG_EXT = ["pdf","jpg","jpeg","png","webp","hwp","docx"];
+const SG_MAX = 10 * 1024 * 1024;                      /* 식스샵 파일 한도: 10MB 이상 불가 */
+
 /* ══════════════════════════════════════════════════════════════ */
 
 const ST = {
@@ -1031,8 +1047,10 @@ function autoStatus(l){
   const first = l.sessions[0], last = l.sessions[l.sessions.length-1];
   /* 초청 강의는 모집 단계가 없다. 끝나기 전까지 계속 '초청 강의'다. */
   if(l.kind === "invite" || l.kind === "consult") return (last && t > last.date) ? "done" : l.kind;
-  if(l.apply && t <  l.apply.from) return "upcoming";
-  if(l.apply && t <= l.apply.to)   return "open";
+  /* 신청서(signup)로 받는 강의는 신청서 기간이 곧 모집 기간이다 */
+  const ap = (l.signup && !l.paid) ? {from:l.signup.from || "", to:sgEnd(l)} : l.apply;
+  if(ap && t <  ap.from) return "upcoming";
+  if(ap && t <= ap.to)   return "open";
   if(first   && t <  first.date)   return "closed";
   if(last    && t <= last.date)    return "running";
   if(last)                         return "done";
@@ -1474,7 +1492,7 @@ const CC_MARK = '<svg class="ccm" viewBox="0 0 24 24" aria-hidden="true" focusab
 function ccWrap(html, mark){ return String(html||"").replace(/클로드 코드/g, '<span class="cc">' + (mark ? CC_MARK : "") + '클로드 코드</span>'); }
 function renderOpen(){
   const el = q("#openGrid");
-  const open = LECTURES.filter(l=>l.status==="open");
+  const open = LECTURES.filter(l=> (l.signup && !l.paid) ? sgOpen(l) : l.status==="open");
   if(!open.length){
     /* 모집이 가장 먼저 열리는 강의를 고른다. 배열 순서로 [0] 을 쓰면 늦게 열리는 강의가 먼저 안내된다.
        (2026-09-22 고침: 클로드 코드 2기(모집 10/12)가 옴니채널 2차(모집 9/28)보다 먼저 안내되고 있었다) */
@@ -1490,12 +1508,15 @@ function renderOpen(){
     return;
   }
   el.innerHTML = open.map(l=>{
-    const left = l.apply ? days(TODAY, l.apply.to) : -1;
+    const sg = sgOpen(l);
+    const endD = sg ? sgEnd(l) : (l.apply && l.apply.to);
+    const left = endD ? days(TODAY, endD) : -1;
     const first = l.sessions[0];
     const p = l.pitch;
     return `<div class="open-card rv">
       <div class="badge-row">
         <span class="st st-open">모집중</span>
+        ${sg ? `<span class="sg-tag">${esc(sgType(l))}</span>` : ""}
         <span class="host">${esc(l.host)}</span>
         ${left>=0 ? `<span class="dday" style="margin-left:auto">마감 D-${left}</span>` : ""}
       </div>
@@ -1517,7 +1538,8 @@ function renderOpen(){
       </div>
       ${l.perk?`<div class="oc-perk"><span class="pk">수료 혜택</span><div class="pb">${l.perk}</div></div>`:""}
       <div class="oc-act">
-        <button class="btn wide" data-apply>신청하기 <i>↓</i></button>
+        ${sg ? `<button class="btn wide" data-signup="${esc(l.id)}">신청서 쓰기 <i>→</i></button>`
+             : `<button class="btn wide" data-apply>신청하기 <i>↓</i></button>`}
       </div></div>`;
   }).join("");
 }
@@ -1718,7 +1740,8 @@ function openLec(id, push){
   const l = lecById(id); if(!l) return;
   const first = l.sessions[0], lastS = l.sessions[l.sessions.length-1];
   const period = first ? (first===lastS ? fmtw(first.date) : `${fmtw(first.date)} ~ ${fmtw(lastS.date)}`) : "준비 중";
-  const canApply = l.status==="open";
+  const canSignup = sgOpen(l);
+  const canApply = !(l.signup && !l.paid) && l.status==="open";
   const headLabel = (l.kind === "invite" && l.status !== "done") ? "대상 인원" : "수강 인원";
   const rv = l.reviews && l.reviews.length ? `
     <div class="rv-head">
@@ -1756,7 +1779,10 @@ function openLec(id, push){
       ${rv}
       ${canApply ? `<div style="margin-top:26px;display:flex;justify-content:flex-end">
         <button class="btn" data-apply>신청하기 <i>↓</i></button></div>` : ""}
+      ${canSignup ? `<div style="margin-top:26px;display:flex;justify-content:flex-end">
+        <button class="btn" data-signup="${esc(l.id)}">신청서 쓰기 <i>→</i></button></div>` : ""}
     </div>`;
+  q("#ovBox").classList.remove("sg-box");
   q("#ov").classList.add("on");
   document.body.style.overflow = "hidden";
   if(push !== false) history.replaceState(null,"","#lecture-"+id);
@@ -1769,6 +1795,9 @@ function closeLec(){
 
 /* ── 이벤트 ── */
 function onClick(e){
+  const sgb = e.target.closest("[data-signup]");
+  if(sgb){ openSignup(sgb.getAttribute("data-signup")); return; }
+  if(e.target.closest("[data-sg-login]")){ sgGoLogin(e.target.closest("[data-sg-login]").getAttribute("data-sg-login")); return; }
   if(e.target.closest("[data-apply]")){
     closeLec();
     const form = document.querySelector("#" + APPLY_ANCHOR);
@@ -1862,6 +1891,8 @@ function boot(){
   if(boundNode !== host){
     host.addEventListener("click", onClick, true);
     host.addEventListener("keydown", onKey, true);
+    host.addEventListener("submit", sgOnSubmit, true);
+    host.addEventListener("input", sgOnInput, true);
     host.addEventListener("touchstart", onTouchStart, {passive:true});
     host.addEventListener("touchend", onTouchEnd, {passive:true});
     boundNode = host;
@@ -1873,7 +1904,11 @@ function boot(){
   if(!hashOpened){
     hashOpened = true;
     const h = (location.hash||"").match(/^#lecture-(.+)$/);
+    const hs = (location.hash||"").match(/^#signup-(.+)$/);
+    const rs = sgResume();
     if(h) openLec(h[1], false);
+    else if(hs) openSignup(decodeURIComponent(hs[1]));
+    else if(rs) openSignup(rs);
   }
   return true;
 }
@@ -1885,6 +1920,215 @@ if(!boot()){
 setTimeout(wireNet, 800);
 setTimeout(wireNet, 2500);
 if(typeof bm !== "undefined") bm.onContextChange = function(){ boot(); };
+
+/* ══ 무료 · 초청 · 용역 강의 신청서 — 식스샵 커스텀 DB lecture-apply (2026-10-30) ══════════
+   강의 객체에 signup 이 있을 때만 쓴다(위 LECTURES 머리말). 유료(paid) 강의는 상품 주문이라 여기 안 온다.
+   · 회원만 낸다: 식스샵 회원 토큰(localStorage 'sixshop-user-info'.token)으로 /my 채널에 쓴다.
+     컬렉션 권한 = 회원 생성 · 본인 행 조회만(비회원 끔). 상태 · 출석은 관리자(강의 운영판)만 바꾼다.
+   · 첨부는 비공개(PRIVATE) 파일 — 업로드 주소를 받아 PUT 한 뒤 { url, size } 로 함께 저장한다.
+   · 고객 알림(알림톡) 발신은 컬렉션에서 꺼져 있다. 문구는 대표님이 검수한 뒤 관리자 화면에서 켠다. */
+function sgEnd(l){ return (l.signup && l.signup.to) || (l.sessions && l.sessions[0] && l.sessions[0].date) || ""; }
+function sgOpen(l){
+  if(!l || !l.signup || l.paid) return false;
+  const t = ymd(TODAY), s = l.signup, e = sgEnd(l);
+  if(s.from && t < s.from) return false;
+  return !e || t <= e;
+}
+function sgType(l){ return SG_TYPES[l.signup && l.signup.type] || "무료 강의"; }
+function sgHost(l){ return (l.signup && l.signup.host) || l.host || ""; }
+function sgToken(){ try{ const u = JSON.parse(localStorage.getItem("sixshop-user-info") || "null"); return (u && u.token) ? String(u.token) : ""; }catch(e){ return ""; } }
+function sgHeaders(tok, json){ const h = {"ss-store-id":SG_STORE, "Authorization":"Bearer " + tok}; if(json) h["Content-Type"] = "application/json"; return h; }
+/* 휴대폰 번호 → 010-1234-5678 꼴. 휴대폰이 아니면 빈 값 */
+function sgPhone(v){
+  const d = String(v || "").replace(/\D/g, "");
+  if(!/^01[016789]\d{7,8}$/.test(d)) return "";
+  return d.length === 11 ? d.slice(0,3) + "-" + d.slice(3,7) + "-" + d.slice(7) : d.slice(0,3) + "-" + d.slice(3,6) + "-" + d.slice(6);
+}
+function sgResume(){
+  try{
+    const r = JSON.parse(localStorage.getItem(SG_RESUME) || "null");
+    if(!r || !r.id) return "";
+    if(Date.now() - (r.t || 0) > 30 * 60 * 1000){ localStorage.removeItem(SG_RESUME); return ""; }
+    if(!sgToken()) return "";
+    localStorage.removeItem(SG_RESUME);
+    return r.id;
+  }catch(e){ return ""; }
+}
+function sgGoLogin(id){
+  try{ localStorage.setItem(SG_RESUME, JSON.stringify({id:id, t:Date.now()})); }catch(e){}
+  location.href = "/auth/login";
+}
+function sgStatusText(s){
+  return s === "확정" ? "참가가 확정되었습니다" : s === "불가" ? "이번에는 참가가 어렵습니다" : "검토 중입니다";
+}
+
+/* 창(오버레이)에 신청서 화면을 그린다. view: login · loading · already · form · done · error */
+function sgShow(l, view, data){
+  const first = l.sessions[0], lastS = l.sessions[l.sessions.length-1];
+  const period = first ? (first === lastS ? fmtw(first.date) : `${fmtw(first.date)} ~ ${fmtw(lastS.date)}`) : "";
+  const name = l.title + (l.edition ? " " + l.edition : "");
+  const kakao = /KAKAOTALK/i.test(navigator.userAgent || "");
+  let body = "";
+  if(view === "login"){
+    body = `<div class="sg-msg">
+        <h4>회원 로그인 뒤에 신청할 수 있습니다</h4>
+        <p>신청 현황을 다시 확인하고, 첨부 파일을 안전하게 보관하려고 회원으로 받습니다.<br>
+        아직 회원이 아니시면 <b>카카오 · 네이버</b>로 바로 가입하실 수 있습니다.</p>
+        <button class="btn wide" type="button" data-sg-login="${esc(l.id)}">로그인하고 신청하기 <i>→</i></button>
+        <p class="sg-help">로그인한 뒤 이 강의 페이지로 돌아오시면 신청서가 이어서 열립니다.</p>
+      </div>`;
+  } else if(view === "loading"){
+    body = `<div class="sg-msg"><p>신청 내역을 확인하고 있습니다…</p></div>`;
+  } else if(view === "already"){
+    body = `<div class="sg-msg">
+        <h4>이미 신청하셨습니다</h4>
+        <p><b>${esc(name)}</b> — ${esc(sgStatusText(data && data.status))}.</p>
+        <p class="sg-help">신청일 ${esc(String((data && data.createdAt) || "").slice(0,10))} · 바꿀 내용이 있으면 문의로 알려 주세요.</p>
+      </div>`;
+  } else if(view === "done"){
+    body = `<div class="sg-msg">
+        <h4>신청이 접수되었습니다</h4>
+        <p>검토 후 <b>최대 48시간 안에</b> 참가 확정 여부를 연락드립니다.</p>
+      </div>`;
+  } else if(view === "error"){
+    body = `<div class="sg-msg">
+        <h4>신청 내역을 불러오지 못했습니다</h4>
+        <p>${esc(data || "잠시 뒤 다시 시도해 주세요.")}</p>
+        <button class="btn" type="button" data-signup="${esc(l.id)}">다시 시도</button>
+      </div>`;
+  } else {
+    body = `${kakao ? `<div class="af-kakao">카카오톡 안에서는 <b>한글 입력이 안 될 수 있습니다.</b><br>아래 버튼으로 크롬 · 사파리에서 열어 작성해 주세요.<br>
+        <a href="kakaotalk://web/openExternal?url=${encodeURIComponent(location.href.split("#")[0] + "#signup-" + l.id)}">크롬 · 사파리로 열기</a></div>` : ""}
+      <form class="sg-form" data-sg-form="${esc(l.id)}" novalidate>
+        <label class="sg-f"><span>이름 <b>*</b></span>
+          <input name="name" type="text" maxlength="40" autocomplete="name" required></label>
+        <label class="sg-f"><span>휴대폰 번호 <b>*</b></span>
+          <input name="phone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="010-0000-0000" required></label>
+        <label class="sg-f"><span>소속 <small>회사 · 가게 이름 (선택)</small></span>
+          <input name="org" type="text" maxlength="60" autocomplete="organization"></label>
+        <div class="sg-f"><span>주관 기관</span><div class="sg-ro">${esc(sgHost(l)) || "—"}</div></div>
+        <label class="sg-f"><span>첨부 파일 <small>입주기업 확인서 등 · 선택 · 10MB 미만</small></span>
+          <input name="proof" type="file" accept=".${SG_EXT.join(",.")}">
+          <em class="sg-help">담당자만 볼 수 있게 비공개로 보관합니다.</em></label>
+        <div class="sg-agree">
+          <label><input name="agree" type="checkbox"> <b>개인정보 수집 · 이용에 동의합니다 (필수)</b></label>
+          <ul>
+            <li>수집 항목: 이름, 휴대폰 번호, 소속, 첨부 파일(내신 경우)</li>
+            <li>이용 목적: 신청 확인, 참가 확정 · 일정 안내 연락, 출석 · 수료 관리, 주관 기관에 참가 · 수료 결과 보고</li>
+            <li>보유 기간: ${SG_KEEP}, 그 뒤 파기</li>
+            <li>동의하지 않으실 수 있으나, 그 경우 신청을 받을 수 없습니다.</li>
+          </ul>
+        </div>
+        <p class="sg-err" role="alert"></p>
+        <button class="btn wide sg-send" type="submit">신청서 보내기</button>
+      </form>`;
+  }
+  const box = q("#ovBox");
+  box.innerHTML = `
+    <div class="ov-hd">
+      <button class="ov-x" data-close aria-label="닫기">✕</button>
+      <div class="lc-top" style="margin:0">
+        <span class="st st-open">신청서</span>
+        <span class="sg-tag">${esc(sgType(l))}</span>
+        <span class="host">${esc(sgHost(l))}</span>
+      </div>
+      <h3>${ccWrap(esc(l.title))}${l.edition ? ` <span style="color:var(--accent)">${esc(l.edition)}</span>` : ""}</h3>
+      ${period ? `<div class="sg-when">${period}${l.sessions.length > 1 ? ` · ${l.sessions.length}회차` : ""}</div>` : ""}
+    </div>
+    <div class="ov-bd">${body}</div>`;
+  box.classList.add("sg-box");      /* 등장 효과 끔 — 카카오톡 웹뷰 한글 입력이 흔들리지 않게(10/21 교훈) */
+  q("#ov").classList.add("on");
+  document.body.style.overflow = "hidden";
+}
+
+function openSignup(id){
+  const l = lecById(id);
+  if(!l) return;
+  if(!sgOpen(l)){ openLec(id); return; }
+  history.replaceState(null, "", "#signup-" + id);
+  const tok = sgToken();
+  if(!tok){ sgShow(l, "login"); return; }
+  sgShow(l, "loading");
+  const url = SG_API + "?fields=lecture,status,createdAt&f:lecture:eq=" + encodeURIComponent(l.id) + "&limit=5";
+  fetch(url, {mode:"cors", headers:sgHeaders(tok)})
+    .then(r => {
+      if(r.status === 401 || r.status === 403) return {login:true};
+      if(!r.ok) throw new Error("응답 " + r.status);
+      return r.json();
+    })
+    .then(j => {
+      if(j && j.login){ sgShow(l, "login"); return; }
+      const rows = Array.isArray(j) ? j : ((j && j.data) || []);
+      if(rows.length) sgShow(l, "already", rows[0]);
+      else sgShow(l, "form");
+    })
+    .catch(e => sgShow(l, "error", "잠시 뒤 다시 시도해 주세요. (" + (e && e.message || e) + ")"));
+}
+
+function sgOnInput(e){
+  const t = e.target;
+  if(t && t.name === "phone" && t.closest("[data-sg-form]")){
+    const f = sgPhone(t.value);
+    if(f && f !== t.value) t.value = f;
+  }
+}
+
+function sgOnSubmit(e){
+  const form = e.target.closest && e.target.closest("[data-sg-form]");
+  if(!form) return;
+  e.preventDefault();
+  const l = lecById(form.getAttribute("data-sg-form"));
+  if(!l) return;
+  const err = form.querySelector(".sg-err"), btn = form.querySelector(".sg-send");
+  const say = m => { err.textContent = m; };
+  /* form.name 은 폼 자신의 name 속성이라 칸은 선택자로 찾는다 */
+  const fv = n => form.querySelector("[name=\"" + n + "\"]");
+  const name = fv("name").value.trim(), phone = sgPhone(fv("phone").value), org = fv("org").value.trim();
+  const file = fv("proof").files && fv("proof").files[0];
+  if(!name){ say("이름을 적어 주세요."); fv("name").focus(); return; }
+  if(!phone){ say("휴대폰 번호를 010-0000-0000 꼴로 적어 주세요."); fv("phone").focus(); return; }
+  if(!fv("agree").checked){ say("개인정보 수집 · 이용에 동의해 주셔야 신청할 수 있습니다."); return; }
+  if(file){
+    const ext = (file.name.split(".").pop() || "").toLowerCase();
+    if(SG_EXT.indexOf(ext) < 0){ say("첨부 파일은 " + SG_EXT.join(", ") + " 만 올릴 수 있습니다."); return; }
+    if(file.size >= SG_MAX){ say("첨부 파일은 10MB 미만이어야 합니다."); return; }
+  }
+  const tok = sgToken();
+  if(!tok){ sgShow(l, "login"); return; }
+  say(""); btn.disabled = true; btn.textContent = "보내는 중…";
+  const first = l.sessions[0];
+  const doc = {
+    name:name, phone:phone, org:org, lecture:l.id,
+    lectureTitle:l.title + (l.edition ? " " + l.edition : ""),
+    lectureDate:first ? first.date : "", sessionCount:l.sessions.length,
+    host:sgHost(l), agree:true, agreeAt:new Date().toISOString()
+  };
+  /* 첨부가 있으면: 비공개 업로드 주소 받기 → PUT → { url, size } */
+  const upload = !file ? Promise.resolve(null) :
+    fetch(SG_API + "/file", {method:"POST", mode:"cors", headers:sgHeaders(tok, true),
+      body:JSON.stringify({fileName:file.name, contentType:file.type || "application/octet-stream", contentLength:file.size, access:"PRIVATE"})})
+    .then(r => { if(!r.ok) throw new Error("첨부 주소 " + r.status); return r.json(); })
+    .then(j => {
+      const u = (j && j.data) || j;
+      if(!u || !u.upload || !u.url) throw new Error("첨부 주소 없음");
+      return fetch(u.upload, {method:"PUT", headers:{"Content-Type":file.type || "application/octet-stream"}, body:file})
+        .then(r => { if(!r.ok) throw new Error("첨부 올리기 " + r.status); return {url:u.url, size:file.size}; });
+    });
+  upload
+    .then(proof => {
+      if(proof) doc.proof = proof;
+      return fetch(SG_API, {method:"POST", mode:"cors", headers:sgHeaders(tok, true), body:JSON.stringify(doc)});
+    })
+    .then(r => {
+      if(r.status === 401 || r.status === 403){ sgShow(l, "login"); return; }
+      if(!r.ok) return r.text().then(t => { throw new Error("저장 " + r.status + (t ? " · " + t.slice(0,120) : "")); });
+      sgShow(l, "done");
+    })
+    .catch(ex => {
+      btn.disabled = false; btn.textContent = "신청서 보내기";
+      say("보내지 못했습니다. 잠시 뒤 다시 시도해 주세요. (" + (ex && ex.message || ex) + ")");
+    });
+}
 
 /* ── 신청 폼(다른 블록) 한글 입력 보정 — 2026-10-21 대표님: 카카오톡 안 브라우저에서 한글이 안 써짐 ──
    ① 폼 상자의 등장 효과(transform · opacity)를 꺼서 웹뷰 입력기가 흔들리지 않게 한다
@@ -1926,7 +2170,7 @@ function heroSync(){
   const host = document.querySelector(".lhx");
   if(!host || !host.querySelector(".lhx-act .lhx-cta")) return false;
   const act = host.querySelector(".lhx-act"), cta = act.querySelector(".lhx-cta");
-  const open = LECTURES.filter(l => l.status === "open" && !l.kind)
+  const open = LECTURES.filter(l => ((l.signup && !l.paid) ? sgOpen(l) : l.status === "open") && !l.kind)
                        .sort((a,b) => a.sessions[0].date < b.sessions[0].date ? -1 : 1)[0];
   const key = open ? "open:" + open.id : "idle";
   if(host.dataset.sbaHero !== key){
@@ -1942,11 +2186,14 @@ function heroSync(){
       set(".lhx-sub", h.subtitle || open.summary, true);
       if(h.chips){ host.querySelectorAll(".lhx-chip").forEach((c,i) => { if(h.chips[i] != null){ const b = c.querySelector("b"); c.innerHTML = (b ? b.outerHTML : "") + esc(h.chips[i]); c.__cc = false; } }); }
       const first = open.sessions[0];
-      set(".lhx-meta", h.meta || ("모집 ~ " + fmtw(open.apply.to) + " · 교육 " + (first ? fmtw(first.date) : "")));
+      const endD = sgOpen(open) ? sgEnd(open) : (open.apply && open.apply.to);
+      set(".lhx-meta", h.meta || ((endD ? "모집 ~ " + fmtw(endD) + " · " : "") + "교육 " + (first ? fmtw(first.date) : "")));
       cta.textContent = h.cta || (name + " 신청하기");
       cta.removeAttribute("data-pick");
+      if(sgOpen(open)) cta.setAttribute("data-sg", open.id); else cta.removeAttribute("data-sg");
       if(cta2) cta2.remove();
     } else {
+      cta.removeAttribute("data-sg");
       cta.setAttribute("data-pick", "다음기수알림");
       if(!cta2){
         cta2 = document.createElement("button");
@@ -1958,6 +2205,13 @@ function heroSync(){
   }
   if(!host.__sbaPick){
     host.__sbaPick = true;
+    /* 신청서로 받는 강의면 히어로 단추가 게시판 폼으로 내려가지 않고 신청서 창을 연다 (잡기 단계에서 먼저 가로챈다) */
+    host.addEventListener("click", e => {
+      const b = e.target.closest(".lhx-cta[data-sg]");
+      if(!b) return;
+      e.preventDefault(); e.stopPropagation();
+      openSignup(b.getAttribute("data-sg"));
+    }, true);
     host.addEventListener("click", e => {
       const b = e.target.closest("[data-go=\"apply\"]");
       if(!b) return;

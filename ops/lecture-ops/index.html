@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>강의 운영판</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1>강의 운영판</h1>
+    <p class="sub">무료 · 초청 · 용역 강의 신청서(커스텀 DB <code>lecture-apply</code>)를 강의별로 봅니다.</p>
+  </header>
+
+  <div id="state" class="state">스토어 매니저에서 인증 정보를 받는 중입니다…</div>
+
+  <main id="main" hidden>
+    <section class="pick">
+      <label for="lecSel">강의</label>
+      <select id="lecSel"></select>
+      <button type="button" id="reload" class="ghost">새로 불러오기</button>
+    </section>
+
+    <section class="sum" id="sum"></section>
+
+    <section class="tools">
+      <div class="chips" id="stFilter">
+        <button type="button" data-st="" class="on">전체</button>
+        <button type="button" data-st="신청">신청</button>
+        <button type="button" data-st="확정">확정</button>
+        <button type="button" data-st="불가">불가</button>
+      </div>
+      <input type="search" id="q" placeholder="이름 · 소속 찾기">
+      <label class="crit">수료 기준 <input type="number" id="crit" min="1" step="1" inputmode="numeric" placeholder="?"> 회 이상 출석</label>
+      <button type="button" id="csv" class="pri">엑셀(CSV) 내려받기</button>
+    </section>
+
+    <p class="note" id="note"></p>
+    <div class="list" id="list"></div>
+  </main>
+</div>
+<script src="/assets/app.js"></script>
+</body>
+</html>
