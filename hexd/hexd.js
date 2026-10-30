@@ -1419,9 +1419,13 @@ function renderGap(root, gap){
     +(ev?'<h4 class="hexd-gap-sub">'+evHead+'</h4><ul class="hexd-gap-ev">'+ev+'</ul>':'')
     +'<h4 class="hexd-gap-sub">'+taskHead+'</h4><div class="hexd-gap-task">'+linesOf(gap.task)+'</div>'
     +masterNote
-    +(gap.concernNote?'<p class="hexd-foot">&#8251; '+linesOf(gap.concernNote)+'</p>':'');
+    +(gap.concernNote?'<p class="hexd-foot">&#8251; '+linesOf(gap.concernNote)+'</p>':'')
+    +'<p class="hexd-gap-cta">이 부분은 상담에서 함께 볼 수 있어요.<br><button type="button" data-consult>이 결과로 상담 신청 &rsaquo;</button></p>';
+  const gb=gw.querySelector('[data-consult]'); if(gb) gb.onclick=goConsult;
   gw.style.display='block';
 }
+/* 상담 신청: 컨설팅 페이지의 상담 신청서로, 결과 코드를 붙여 이동(신청서가 숨은 칸에 자동 첨부) — 결과 화면의 두 버튼이 같이 쓴다 */
+function goConsult(){ location.href='/cmpwyv9vbez2s01unagivd0pq?code='+encodeURIComponent(_rcode||''); }
 /* 익명 저장: 이름·연락처 없음. 기본은 이 기기(localStorage)에 두고, 저장소 연결 함수(window.SBA_HEXD_SAVE)가 있으면 그쪽으로도 보낸다 */
 const RESULTS_KEY="sba_hexd_results_v2";
 /* 서버 저장: 식스샵 커스텀 DB `hexd-results` (public 채널은 생성만 열려 있음 → 방문자는 쓰기만, 읽기는 관리자·본인만) */
@@ -1568,7 +1572,7 @@ function showResult(root, opts){
   const shareUrl=location.origin+location.pathname;
   const shareMsg='나는 "'+type.nickname+'" 유형 사업가! 나의 유형도 알아보기 → '+shareUrl;
   const enc=encodeURIComponent(shareMsg);
-  root.querySelector('#consultBtn').onclick=()=>{ location.href='/cmpwyv9vbez2s01unagivd0pq?code='+encodeURIComponent(_rcode); };
+  root.querySelector('#consultBtn').onclick=goConsult;
   root.querySelector('#reviewBtn').onclick=()=>show(root,'s-ax-0');
   /* 후기 남기기: 테마의 후기 글쓰기 스크립트(sbaResultChar)와 같은 형식으로 결과 캐릭터를 기억한 뒤 게시판 글쓰기로 이동 */
   const rw=root.querySelector('#reviewWrite'); if(rw) rw.onclick=()=>{

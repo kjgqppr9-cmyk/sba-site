@@ -643,3 +643,7 @@ div[data-block-id="6a3220721cfd844d4bfb8d5b"] .board-item .content{font-size:12.
 @keyframes hexdPop{0%{outline:2px solid rgba(217,174,75,.85);outline-offset:0;filter:brightness(1.05)}100%{outline:2px solid rgba(217,174,75,0);outline-offset:7px;filter:none}}
 @media(prefers-reduced-motion:reduce){.hexd .hexd-opt.hx-pop{animation:none}.hexd .hexd-intro .hexd-chip:hover,.hexd .hexd-intro .hexd-point:hover{transform:none}}
 .hexd .hexd-resume-new:active{transform:translateY(1px)!important;box-shadow:inset 3px 3px 7px #d4d0c5,inset -3px -3px 7px #fdfdfb!important;transition:transform 80ms,box-shadow 80ms!important}
+/* 2026-10-30: 먼저 살펴볼 곳 카드 끝의 상담 신청 길(글자 링크, 결과 코드 첨부) */
+.hexd .hexd-gap-cta{margin:18px 0 0;padding-top:14px;border-top:1px solid rgba(176,126,34,.28);font-size:13.5px;line-height:1.7;color:#4b5148;word-break:keep-all}
+.hexd .hexd-gap-cta button{background:none;border:0;padding:4px 0;font:inherit;font-weight:800;color:#006241;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.hexd .hexd-gap-cta button:hover{color:#00613e;text-decoration-thickness:2px}
