@@ -11,8 +11,9 @@
   var PAGE = 200, MAX_PAGES = 25;              /* 한 번에 200건씩, 최대 5,000건까지 나눠 받는다 */
   var STATUSES = ['신청', '확정', '불가'];
   var LS_LEC = 'sba_ops_lec', LS_CRIT = 'sba_ops_crit_';
+  var MAX_SESSIONS = 30;                       /* 회차 수 상한 — 이보다 크거나 정수가 아니면 그 값은 무시한다 */
 
-  var auth = null, rows = [], cur = '', stFilter = '', query = '', busy = {};
+  var auth = null, rows = [], cur = '', stFilter = '', query = '', busy = {}, loading = false;
 
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
@@ -65,27 +66,43 @@
   }
 
   /* ── 불러오기 ── */
+  /* 저장 중에는 다시 불러오지 않는다(옛 상태를 읽어 저장 결과를 덮는 일 방지). 다 받은 뒤에 한 번에 바꾼다 */
   function loadAll() {
-    rows = [];
+    if (loading) return Promise.resolve();
+    if (Object.keys(busy).length) { note('저장이 끝난 뒤에 다시 불러와 주세요.', 'warn'); return Promise.resolve(); }
+    loading = true;
+    var got = [];
     state('신청서를 불러오는 중입니다…');
     $('main').hidden = true;
     function page(n) {
       return api('?fields=' + FIELDS + '&sort=createdAt:asc&page=' + n + '&limit=' + PAGE).then(function (list) {
         list = Array.isArray(list) ? list : [];
-        rows = rows.concat(list);
-        state('신청서를 불러오는 중입니다… (' + rows.length + '건)');
+        got = got.concat(list);
+        state('신청서를 불러오는 중입니다… (' + got.length + '건)');
         if (list.length === PAGE && n < MAX_PAGES) return page(n + 1);
         return n >= MAX_PAGES && list.length === PAGE;
       });
     }
     return page(1).then(function (cut) {
+      loading = false;
+      rows = got;
       state('');
       $('main').hidden = false;
       buildLectures();
       if (cut) note('신청서가 ' + rows.length + '건을 넘어 앞의 ' + rows.length + '건만 불러왔습니다.', 'warn');
     }).catch(function (e) {
+      loading = false;
       state(errText(e), 'err');
     });
+  }
+
+  /* 회차 수: 1~MAX_SESSIONS 정수만 믿는다. 신청서는 강의 페이지 데이터로 넣지만 회원이 API 로 다른 값을 넣을 수 있다 */
+  function sessionsOf(r) {
+    var v = r.sessionCount;
+    return (typeof v === 'number' || (typeof v === 'string' && /^\d+$/.test(v))) && +v >= 1 && +v <= MAX_SESSIONS && +v % 1 === 0 ? +v : 0;
+  }
+  function badSessions() {
+    return rows.filter(function (r) { return r.sessionCount != null && r.sessionCount !== '' && !sessionsOf(r); }).length;
   }
 
   function lectures() {
@@ -94,7 +111,7 @@
       var k = r.lecture || '(강의 키 없음)';
       var m = map[k] || (map[k] = {key: k, title: r.lectureTitle || k, date: r.lectureDate || '', sessions: 0, host: r.host || '', n: 0});
       m.n++;
-      if (r.sessionCount > m.sessions) m.sessions = r.sessionCount;
+      if (sessionsOf(r) > m.sessions) m.sessions = sessionsOf(r);
       if (!m.date && r.lectureDate) m.date = r.lectureDate;
       if (!m.host && r.host) m.host = r.host;
     });
@@ -119,6 +136,8 @@
     sel.value = cur;
     $('crit').value = lsGet(LS_CRIT + cur) || '';
     render();
+    var bad = badSessions();
+    if (bad) note('회차 수가 1~' + MAX_SESSIONS + ' 범위를 벗어난 신청서 ' + bad + '건은 회차 수를 무시했습니다.', 'warn');
   }
 
   /* ── 계산 ── */
@@ -196,6 +215,9 @@
     render();
     return api('/' + encodeURIComponent(r.id), {method: 'PUT', body: patch}).then(function () {
       delete busy[r.id];
+      /* 그사이 목록이 새로 들어왔으면 지금 목록의 같은 행에도 저장 결과를 넣는다 */
+      var now = rowById(r.id);
+      if (now && now !== r) Object.keys(patch).forEach(function (k) { now[k] = patch[k]; });
       render();
       note('저장했습니다 — ' + (r.name || '') + ' ' + Object.keys(patch).map(function (k) { return k === 'status' ? '상태 ' + patch[k] : '출석 ' + (patch[k] || '없음'); }).join(', '), 'ok');
     }).catch(function (e) {
@@ -291,9 +313,18 @@
   }
 
   /* ── 인증 (R9~R11) ── */
+  /* 인증 메시지는 이 페이지를 띄운 부모 창(e.source)에서, 식스샵 출처(https · sixshop.com / sixshop.io 계열)로 온 것만 받는다.
+     식스샵 문서(R9~R10 · cms.json)에 부모 출처가 적혀 있지 않아 계열 허용 목록으로 둔다(스토어 매니저 = store.sixshop.com). */
+  function trustedOrigin(o) {
+    var m = /^https:\/\/([a-z0-9.-]+)(?::\d+)?$/i.exec(String(o || ''));
+    if (!m) return false;
+    var h = m[1].toLowerCase();
+    return h === 'sixshop.com' || h === 'sixshop.io' || /\.sixshop\.(com|io)$/.test(h);
+  }
   window.addEventListener('message', function (e) {
     var d = e.data;
     if (auth || !d || d.type !== 'SIXSHOP_APP_PAGE_AUTH') return;
+    if (e.source !== window.parent || window.parent === window || !trustedOrigin(e.origin)) return;
     var p = d.payload || {};
     if (!p.storeName || !p.userId || !p.userToken) return;
     auth = {storeName: p.storeName, userId: p.userId, userToken: p.userToken};

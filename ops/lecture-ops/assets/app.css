@@ -53,8 +53,9 @@ button{cursor:pointer}
 .row.off{opacity:.62}
 .row.busy{border-color:var(--gold)}
 .row.busy button{pointer-events:none}
-.who b{display:block;font-size:16px;font-weight:800;color:var(--house)}
-.who span{font-size:13px;color:var(--ink2)}
+.who{min-width:0}
+.who b{display:block;font-size:16px;font-weight:800;color:var(--house);overflow-wrap:anywhere}
+.who span{display:block;font-size:13px;color:var(--ink2);overflow-wrap:anywhere}
 .tel a{color:var(--green);font-weight:700;text-decoration:none;font-variant-numeric:tabular-nums;white-space:nowrap}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:999px;overflow:hidden}
 .seg button{border:none;background:#fff;font-weight:800;font-size:13.5px;padding:8px 13px;color:var(--ink2)}
@@ -72,7 +73,7 @@ button{cursor:pointer}
 .empty{background:#fff;border-radius:14px;padding:30px;text-align:center;color:var(--ink2)}
 
 @media (max-width:860px){
-  .row{grid-template-columns:1fr auto;gap:10px 12px}
+  .row{grid-template-columns:minmax(0,1fr) auto;gap:10px 12px}
   .row .who{grid-column:1}
   .row .tel{grid-column:2;text-align:right}
   .row .seg{grid-column:1 / -1;justify-self:start}

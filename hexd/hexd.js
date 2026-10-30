@@ -1425,7 +1425,15 @@ function renderGap(root, gap){
   gw.style.display='block';
 }
 /* 상담 신청: 컨설팅 페이지의 상담 신청서로, 결과 코드를 붙여 이동(신청서가 숨은 칸에 자동 첨부) — 결과 화면의 두 버튼이 같이 쓴다 */
-function goConsult(){ location.href='/cmpwyv9vbez2s01unagivd0pq?code='+encodeURIComponent(_rcode||''); }
+/* 방금 낸 결과의 서버 저장이 아직이면 최대 2.5초 기다린다. 실패했으면 한 번 다시 보낸다. 그래도 안 되면 그냥 이동(결과는 이 기기에 있다) */
+let _saveP=null, _saveDoc=null, _going=false;
+function goConsult(){
+  const go=()=>{ location.href='/cmpwyv9vbez2s01unagivd0pq?code='+encodeURIComponent(_rcode||''); };
+  if(!_saveP||!_saveDoc||_saveDoc.code!==_rcode){ go(); return; }
+  if(_going) return; _going=true;
+  const doc=_saveDoc, limit=new Promise(r=>setTimeout(r,2500));
+  Promise.race([_saveP.then(ok=>ok||saveToServer(doc)), limit]).then(go,go);
+}
 /* 익명 저장: 이름·연락처 없음. 기본은 이 기기(localStorage)에 두고, 저장소 연결 함수(window.SBA_HEXD_SAVE)가 있으면 그쪽으로도 보낸다 */
 const RESULTS_KEY="sba_hexd_results_v2";
 /* 서버 저장: 식스샵 커스텀 DB `hexd-results` (public 채널은 생성만 열려 있음 → 방문자는 쓰기만, 읽기는 관리자·본인만) */
@@ -1455,21 +1463,22 @@ function serverDoc(p){
     lowest:p.gapLabel||'', summary:summary, version:'v'+(p.v||2)+'.5',
     payload:JSON.stringify({pre:p.pre, answers:p.answers, shown:p.shown, gap:p.gap, tie:p.tie, concerns:p.concerns})};
 }
+/* 결과: Promise<true|false> (true = 저장됨 또는 이미 보냄) */
 function saveToServer(p){
   try{
-    if(!window.fetch) return;
-    const key='sba_hexd_sent_'+p.code; try{ if(sessionStorage.getItem(key)) return; }catch(e){}
+    if(!window.fetch) return Promise.resolve(false);
+    const key='sba_hexd_sent_'+p.code; try{ if(sessionStorage.getItem(key)) return Promise.resolve(true); }catch(e){}
     const body=JSON.stringify(serverDoc(p)), tok=customerToken();
     function ok(){ try{ sessionStorage.setItem(key,'1'); }catch(e){} }
-    function toPublic(){ return fetch(CDB_URL,{method:'POST',mode:'cors',headers:cdbHeaders(''),body:body}).then(r=>{ if(r.ok) ok(); else console.warn('[sba-hexd] 저장 응답',r.status); }); }
+    function toPublic(){ return fetch(CDB_URL,{method:'POST',mode:'cors',headers:cdbHeaders(''),body:body}).then(r=>{ if(r.ok){ ok(); return true; } console.warn('[sba-hexd] 저장 응답',r.status); return false; }); }
     /* 로그인 회원 → 본인 채널(소유자 기록, 다른 기기에서 조회 가능). 실패하면 공개 채널로 */
     const first = tok ? fetch(CDB_MY_URL,{method:'POST',mode:'cors',headers:cdbHeaders(tok),body:body}).then(r=>{ if(r.ok){ ok(); return true; } return false; }).catch(()=>false) : Promise.resolve(false);
-    first.then(done=>{ if(!done) return toPublic(); }).catch(e=>{ console.warn('[sba-hexd] 저장 실패',e); });
-  }catch(e){}
+    return first.then(done=>done||toPublic()).catch(e=>{ console.warn('[sba-hexd] 저장 실패',e); return false; });
+  }catch(e){ return Promise.resolve(false); }
 }
 function persistResult(p){
   try{ const all=JSON.parse(localStorage.getItem(RESULTS_KEY)||'{}'); all[p.code]=p; const keys=Object.keys(all).sort((a,b)=>(all[b].t||0)-(all[a].t||0)); keys.slice(20).forEach(k=>{ delete all[k]; }); localStorage.setItem(RESULTS_KEY, JSON.stringify(all)); }catch(e){}
-  saveToServer(p);
+  _saveDoc=p; _saveP=saveToServer(p);
   try{ if(typeof window.SBA_HEXD_SAVE==='function') window.SBA_HEXD_SAVE(withoutDebt(p)); }catch(e){}
 }
 function loadResultByCode(code){ try{ const all=JSON.parse(localStorage.getItem(RESULTS_KEY)||'{}'); return all[String(code||'').toUpperCase()]||null; }catch(e){ return null; } }

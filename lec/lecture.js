@@ -1056,7 +1056,8 @@ function autoStatus(l){
   if(last)                         return "done";
   return "upcoming";
 }
-LECTURES.forEach(l => { if(l.status === "auto") l.status = autoStatus(l); });
+/* manual = 값을 직접 적은 강의(조기 마감 등). 신청서 판정에서 수동이 우선한다(sgOpen) */
+LECTURES.forEach(l => { if(l.status === "auto") l.status = autoStatus(l); else l.manual = true; });
 
 /* ══ 배경 신경망 ═════════════════════════════════════════════
    떠다니는 노드가 가까워지면 서로 이어지고, 망 전체가 물결을 탄다.
@@ -1740,7 +1741,7 @@ function openLec(id, push){
   const l = lecById(id); if(!l) return;
   const first = l.sessions[0], lastS = l.sessions[l.sessions.length-1];
   const period = first ? (first===lastS ? fmtw(first.date) : `${fmtw(first.date)} ~ ${fmtw(lastS.date)}`) : "준비 중";
-  const canSignup = sgOpen(l);
+  const canSignup = sgLive(l);
   const canApply = !(l.signup && !l.paid) && l.status==="open";
   const headLabel = (l.kind === "invite" && l.status !== "done") ? "대상 인원" : "수강 인원";
   const rv = l.reviews && l.reviews.length ? `
@@ -1928,19 +1929,27 @@ if(typeof bm !== "undefined") bm.onContextChange = function(){ boot(); };
    · 첨부는 비공개(PRIVATE) 파일 — 업로드 주소를 받아 PUT 한 뒤 { url, size } 로 함께 저장한다.
    · 고객 알림(알림톡) 발신은 컬렉션에서 꺼져 있다. 문구는 대표님이 검수한 뒤 관리자 화면에서 켠다. */
 function sgEnd(l){ return (l.signup && l.signup.to) || (l.sessions && l.sessions[0] && l.sessions[0].date) || ""; }
-function sgOpen(l){
+/* 신청서 기간 판정. day 를 안 주면 화면 날짜(TODAY — ?d= 미리보기 포함)로 본다.
+   수동으로 적은 마감 · 모집예정 · 강의중 · 완료 상태가 기간보다 우선한다. */
+function sgOpen(l, day){
   if(!l || !l.signup || l.paid) return false;
-  const t = ymd(TODAY), s = l.signup, e = sgEnd(l);
+  if(l.manual && ["closed","upcoming","running","done"].indexOf(l.status) >= 0) return false;
+  const t = day || ymd(TODAY), s = l.signup, e = sgEnd(l);
   if(s.from && t < s.from) return false;
   return !e || t <= e;
 }
+/* 실제로 접수할 수 있는지 — ?d= 미리보기 날짜를 무시하고 지금 한국 시각(UTC+9)으로 본다. 신청서 열기 · 보내기에 쓴다 */
+function sgKstDay(){ return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0,10); }
+function sgLive(l){ return sgOpen(l) && sgOpen(l, sgKstDay()); }
 function sgType(l){ return SG_TYPES[l.signup && l.signup.type] || "무료 강의"; }
 function sgHost(l){ return (l.signup && l.signup.host) || l.host || ""; }
 function sgToken(){ try{ const u = JSON.parse(localStorage.getItem("sixshop-user-info") || "null"); return (u && u.token) ? String(u.token) : ""; }catch(e){ return ""; } }
 function sgHeaders(tok, json){ const h = {"ss-store-id":SG_STORE, "Authorization":"Bearer " + tok}; if(json) h["Content-Type"] = "application/json"; return h; }
 /* 휴대폰 번호 → 010-1234-5678 꼴. 휴대폰이 아니면 빈 값 */
 function sgPhone(v){
-  const d = String(v || "").replace(/\D/g, "");
+  let d = String(v || "").replace(/\D/g, "");
+  /* 국제 형식(+82 10-…, 0082 10-…, +82 010-…)은 국내 번호로 — 국내 휴대폰 번호는 82 로 시작하지 않는다 */
+  if(/^(00)?82/.test(d)) d = "0" + d.replace(/^(00)?82/, "").replace(/^0/, "");
   if(!/^01[016789]\d{7,8}$/.test(d)) return "";
   return d.length === 11 ? d.slice(0,3) + "-" + d.slice(3,7) + "-" + d.slice(7) : d.slice(0,3) + "-" + d.slice(3,6) + "-" + d.slice(6);
 }
@@ -2003,7 +2012,7 @@ function sgShow(l, view, data){
         <label class="sg-f"><span>이름 <b>*</b></span>
           <input name="name" type="text" maxlength="40" autocomplete="name" required></label>
         <label class="sg-f"><span>휴대폰 번호 <b>*</b></span>
-          <input name="phone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="010-0000-0000" required></label>
+          <input name="phone" type="tel" inputmode="tel" maxlength="24" autocomplete="tel" placeholder="010-0000-0000" required></label>
         <label class="sg-f"><span>소속 <small>회사 · 가게 이름 (선택)</small></span>
           <input name="org" type="text" maxlength="60" autocomplete="organization"></label>
         <div class="sg-f"><span>주관 기관</span><div class="sg-ro">${esc(sgHost(l)) || "—"}</div></div>
@@ -2044,7 +2053,7 @@ function sgShow(l, view, data){
 function openSignup(id){
   const l = lecById(id);
   if(!l) return;
-  if(!sgOpen(l)){ openLec(id); return; }
+  if(!sgLive(l)){ openLec(id); return; }
   history.replaceState(null, "", "#signup-" + id);
   const tok = sgToken();
   if(!tok){ sgShow(l, "login"); return; }
@@ -2081,6 +2090,8 @@ function sgOnSubmit(e){
   if(!l) return;
   const err = form.querySelector(".sg-err"), btn = form.querySelector(".sg-send");
   const say = m => { err.textContent = m; };
+  /* 창을 열어 둔 사이 마감됐을 수 있다 — 보낼 때 실제 한국 시각 · 수동 마감으로 다시 본다 */
+  if(!sgLive(l)){ say("신청 기간이 끝났거나 접수가 마감되었습니다."); btn.disabled = true; return; }
   /* form.name 은 폼 자신의 name 속성이라 칸은 선택자로 찾는다 */
   const fv = n => form.querySelector("[name=\"" + n + "\"]");
   const name = fv("name").value.trim(), phone = sgPhone(fv("phone").value), org = fv("org").value.trim();
