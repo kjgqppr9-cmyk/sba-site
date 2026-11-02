@@ -984,8 +984,8 @@ const LECTURES = [
   {
     id:"mfs-3", title:"마켓-핏 스케일러", edition:"3차", status:"auto", pick:"마켓핏3",
     host:"상지대학교 창업보육센터",
-    summary:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · 구매전환 · 광고 세팅)을 하루에 집중해서 진행합니다. 1차 수강생 만족도 5.0의 과정입니다.",
-    summaryHtml:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · <br class=\"m\">구매전환 · 광고 세팅)을 <br class=\"m\">하루에 집중해서 진행합니다.<br class=\"pc\"> "
+    summary:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · 구매전환 · 후킹)을 하루에 집중해서 진행합니다. 1차 수강생 만족도 5.0의 과정입니다.",
+    summaryHtml:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · <br class=\"m\">구매전환 · 후킹)을 <br class=\"m\">하루에 집중해서 진행합니다.<br class=\"pc\"> "
         + "<br class=\"m\">1차 수강생 만족도 5.0의 과정입니다.",
     apply:{from:"2026-11-02", to:"2026-11-09"},
     pitch:{
@@ -1004,14 +1004,14 @@ const LECTURES = [
         + "<b>100만 원 상당 솔루션</b>을 지원합니다.",
     sessions:[
       {date:"2026-11-11", n:1, title:"2차 네 번의 과정을 하루에 — 1부 ~ 4부",
-       tag:"PMF 진단 · 경쟁 지도 · 구매전환 · 광고 실전 세팅", do:"진단서 · 경쟁 지도 · 상세페이지 카피 · 광고문안"}
+       tag:"PMF 진단 · 경쟁 지도 · 구매전환 · 후킹", do:"진단서 · 경쟁 지도 · 상세페이지 카피 · 후킹 문구"}
     ],
     parts:[
       {title:"우리 제품, 정말 시장에 맞습니까", tag:"PMF 진단", do:"AI로 우리 제품 진단서 만들기"},
       {title:"어디서 싸울지부터 정합니다", tag:"시장 조사 · 경쟁 지도 · 포지셔닝",
        do:"AI로 경쟁 지도 그려 안 싸우고 이길 자리 찾기"},
       {title:"보고도 안 사는 이유", tag:"구매전환율을 올리는 심리 기술", do:"AI로 상세페이지·카피 다시 쓰기"},
-      {title:"이제 데려옵니다", tag:"광고 실전 세팅", do:"AI로 키워드·광고문안 뽑아 바로 집행"}
+      {title:"3초 안에 멈춰 세웁니다", tag:"후킹 — 눈길을 붙잡는 첫 문장 · 첫 장면", do:"AI로 우리 제품 후킹 문구 뽑아 바로 쓰기"}
     ],
     hours:7, capacity:null, enrolled:0,
     rating:null, ratingCount:0,
@@ -1034,7 +1034,7 @@ const LECTURES = [
 | 1부 | 우리 제품, 정말 시장에 맞습니까 — PMF 진단 | AI로 우리 제품 진단서 만들기 |
 | 2부 | 어디서 싸울지부터 정합니다 — 시장 조사·경쟁 지도·포지셔닝 | AI로 경쟁 지도 그려 안 싸우고 이길 자리 찾기 |
 | 3부 | 보고도 안 사는 이유 — 구매전환율을 올리는 심리 기술 | AI로 상세페이지·카피 다시 쓰기 |
-| 4부 | 이제 데려옵니다 — 광고 실전 세팅 | AI로 키워드·광고문안 뽑아 바로 집행 |
+| 4부 | 3초 안에 멈춰 세웁니다 — 후킹(눈길을 붙잡는 첫 문장 · 첫 장면) | AI로 우리 제품 후킹 문구 뽑아 바로 쓰기 |
 
 ## 수료 후
 - 수료한 팀 중 **2팀**을 선정해 마케팅·홍보에 쓸 수 있는 **100만 원 상당 솔루션**을 지원합니다
@@ -1053,13 +1053,13 @@ const LECTURES = [
         + "<br class=\"m\">브랜드 메시지를 정리하고, AI로 카피 · 이미지 · 숏폼을 <br class=\"m\">직접 만들어 흩어진 채널을 <br class=\"m\">하나의 운영 체계로 묶습니다.",
     apply:{from:"2026-11-02", to:"2026-11-09"},
     pitch:{
-      kicker:"전 과정 AI 실습 · 입주기업 브랜딩 프로그램<i class=\"pcd\"> · </i><br class=\"m\">하루 7시간",
+      kicker:"전 과정 AI 실습 · 입주기업 브랜딩 프로그램<i class=\"pcd\"> · </i><br class=\"m\">하루 5시간",
       head:"채널마다 다른 우리 브랜드,<br>하나로 묶습니다",
       sub:"말투 · 그림 · 영상이 <b>한 브랜드</b>로 보이게 만드는 하루"
     },
     info:{
       when:"11월 13일(금) <em>하루 과정</em>",
-      time:"오후 1시 ~ 8시 <em>(7시간)</em>",
+      time:"오후 1시 ~ 6시 <em>(5시간)</em>",
       place:"상지대학교 창업보육관<br class=\"pc\"> 3층 라운지"
     },
     prep:["노트북 지참", "AI 유료 구독 <small>(Claude 또는 ChatGPT)</small>"],
@@ -1079,7 +1079,7 @@ const LECTURES = [
       {title:"옴니채널 통합 운영 및 성과 분석",
        tag:"통합 운영안", do:"채널을 하나의 운영 체계로 묶고 성과 보는 법을 익힙니다"}
     ],
-    hours:7, capacity:null, enrolled:0,
+    hours:5, capacity:null, enrolled:0,
     rating:null, ratingCount:0,
     reviews:[],
     detail:`
@@ -1092,7 +1092,7 @@ const LECTURES = [
 | | |
 | --- | --- |
 | **일시** | 11월 13일(금) · 하루 과정 |
-| **시간** | 오후 1시 ~ 8시 (7시간) |
+| **시간** | 오후 1시 ~ 6시 (5시간) |
 | **장소** | 상지대학교 창업보육관 3층 라운지 |
 | **모집** | 11월 2일(월) ~ 11월 9일(월) |
 
@@ -1124,7 +1124,7 @@ const LECTURES = [
 const HERO_MULTI = {
   title:"3차 두 과정을\n동시에 모집합니다",
   lead:"2차 네 번의 과정을 <b>하루에 집중해서</b> 진행합니다.",
-  chips:["전 과정 실습", "하루 7시간 집중", "진단서 · 광고문안 · 브랜드 가이드"],
+  chips:["전 과정 실습", "하루 집중 과정", "진단서 · 후킹 문구 · 브랜드 가이드"],
   meta:"과정마다 수료 2팀 100만 원 상당 솔루션 지원"
 };
 
@@ -1715,7 +1715,8 @@ function renderOpen(){
 }
 
 /* ── ② 강의 달력 ──
-   보여 줄 달 = 오늘을 가운데 둔 앞뒤 두 달 ∪ 강의가 있는 달. */
+   보여 줄 달 = 이번 달 + 앞 두 달 + 뒤 두 달, 딱 다섯 달. 강의가 있어도 이 범위 밖의 달은 넣지 않는다
+   (2026-11-02 대표님: "앞에 두 달, 뒤에 두 달만" — 11월이면 9~1월, 7·8월은 안 보임). */
 const IDX = {};
 LECTURES.forEach(l => l.sessions.forEach(s => {
   (IDX[s.date] = IDX[s.date] || []).push({lec:l, ses:s});
@@ -1726,8 +1727,6 @@ const MONTHS = (function(){
     const m = new Date(TODAY.getFullYear(), TODAY.getMonth()+k, 1);
     set[m.getFullYear()+"-"+p2(m.getMonth()+1)] = 1;
   }
-  Object.keys(IDX).forEach(k => { set[k.slice(0,7)] = 1; });
-  Object.keys(PDAYS).forEach(k => { set[k.slice(0,7)] = 1; });
   return Object.keys(set).sort();
 })();
 let calCur = -1, calPick = null;
