@@ -658,8 +658,8 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 @keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
 .slp .cd.ps{z-index:1;isolation:isolate;color:#fff;font-weight:800}
 .slp .cd.ps.sun,.slp .cd.ps.sat{color:#fff}
-.slp .cd.ps::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:82%;max-width:none;aspect-ratio:1;
-  border-radius:50%;background:#D97757;transform:translate(-50%,-50%)}
+.slp .cd.ps::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc,82%);height:var(--psc,auto);max-width:none;max-height:none;aspect-ratio:1;
+  margin:calc(var(--psc,0px) / -2) 0 0 calc(var(--psc,0px) / -2);border-radius:50%;background:#D97757}
 .slp .calfoot em.ps{border-radius:50%;background:#D97757}
 .slp .mlist li.ps{cursor:default}
 .slp .mlist li.ps:hover{border-color:var(--line);transform:none;box-shadow:none}

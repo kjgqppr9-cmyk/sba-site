@@ -1597,7 +1597,10 @@ function applyPick(){
 /* 개인 일정 — 칸 한 개의 실제 폭을 --psd 로 넘긴다(캡슐 크기의 기준, css .psbar). */
 function psFit(grid){
   const c = grid.querySelector(".cd:not(.pad)");
-  if(c && c.offsetWidth) grid.style.setProperty("--psd", c.offsetWidth + "px");
+  if(!c || !c.offsetWidth) return;
+  grid.style.setProperty("--psd", c.offsetWidth + "px");
+  /* 원 지름은 짝수 정수 px — 82% 를 그대로 쓰면 칸마다 소수점이 달라 원이 1px 씩 찌그러져 보인다 */
+  grid.style.setProperty("--psc", Math.round(c.offsetWidth * .82 / 2) * 2 + "px");
 }
 function renderSched(dir){
   if(!MONTHS.length) return;
