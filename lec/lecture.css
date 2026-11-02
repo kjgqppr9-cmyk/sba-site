@@ -646,20 +646,16 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 
 /* ── 개인 일정 (2026-11-02 대표님 확정 A-2) — 평면 코랄 원 #D97757 · 흰 숫자 800 · 그림자 · 그라데이션 없음(진초록 칸과 같은 결).
    이어진 날은 .psbar(절대 위치 격자 항목, 첫 칸 가운데 ~ 끝 칸 가운데)가 잇는다. 그 안 .pb = 연한 코랄 캡슐 + 1.5px 코랄 테두리,
-   바깥 크기는 칸과 같다(--psd = 칸 실제 폭, JS psFit). 원 사이마다 작은 코랄 다이아(SVG 배경 타일).
-   모션: 처음 보일 때 캡슐이 왼쪽에서 펼쳐지고(.psgo), 다이아가 4.6초 숨쉼. 동작 줄이기면 정지. ── */
+   바깥 크기는 칸과 같다(--psd = 칸 실제 폭, JS psFit). (가운데 다이아는 2026-11-02 대표님 지시로 뺐다)
+   모션: 처음 보일 때 캡슐이 왼쪽에서 펼쳐진다(.psgo). 동작 줄이기면 정지. ── */
 .slp .calgrid{position:relative;--cg:4px;--psd:56px}
 .slp .psbar{position:absolute;z-index:0;pointer-events:none;top:0;bottom:0;font-style:normal;
   left:calc((100% - (var(--n) - 1) * var(--cg)) / var(--n) / 2);right:calc((100% - (var(--n) - 1) * var(--cg)) / var(--n) / 2)}
 .slp .psbar>.pb{position:absolute;display:block;font-style:normal;top:50%;left:calc(var(--psd) / -2);right:calc(var(--psd) / -2);
   height:var(--psd);margin-top:calc(var(--psd) / -2);border-radius:999px;background:#F9E6DE;border:1.5px solid #D97757;
   box-sizing:border-box;transform-origin:left center}
-.slp .psbar>.pb::after{content:"";position:absolute;top:0;bottom:0;left:calc(var(--psd) / 2 - 1.5px);right:calc(var(--psd) / 2 - 1.5px);
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25'%3E%3Csvg x='50%25' y='50%25' overflow='visible'%3E%3Cpath d='M0-4.2L4.2 0L0 4.2L-4.2 0Z' fill='%23D97757'/%3E%3C/svg%3E%3C/svg%3E") 0 0/calc(100% / (var(--n) - 1)) 100% repeat-x}
 .slp .calgrid.psgo .psbar>.pb{animation:psUnroll .9s .2s cubic-bezier(.3,.75,.25,1) both}
-.slp .calgrid.psgo .psbar>.pb::after{animation:psDia 4.6s 1.2s ease-in-out infinite}
 @keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
-@keyframes psDia{0%,100%{opacity:1}50%{opacity:.5}}
 .slp .cd.ps{z-index:1;isolation:isolate;color:#fff;font-weight:800}
 .slp .cd.ps.sun,.slp .cd.ps.sat{color:#fff}
 .slp .cd.ps::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:82%;max-width:none;aspect-ratio:1;
@@ -669,4 +665,4 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist li.ps:hover{border-color:var(--line);transform:none;box-shadow:none}
 .slp .mlist .nm .pdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:#D97757}
 @container (max-width:600px){.slp .calgrid{--cg:3px}}
-@media (prefers-reduced-motion:reduce){.slp .psbar>.pb,.slp .psbar>.pb::after{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.slp .psbar>.pb{animation:none!important}}
