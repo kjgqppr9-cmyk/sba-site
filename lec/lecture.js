@@ -746,7 +746,7 @@ const LECTURES = [
     sessions:[
       {date:"2026-11-04", n:1, title:"블로그 자동화 세팅 · 사용법"}
     ],
-    time:"시간 협의",
+    time:"오후 4시",
     hours:3, capacity:null, enrolled:0,
     rating:null, ratingCount:0,
     reviews:[],
@@ -762,7 +762,7 @@ const LECTURES = [
 ## 한눈에
 | | |
 | --- | --- |
-| **일시** | 11월 4일(수) · 시간 협의 |
+| **일시** | 11월 4일(수) 오후 4시 |
 | **장소** | 리셋하우스 사업장 (방문) |
 | **대상** | 리셋하우스 |
 | **형식** | 1:1 방문 컨설팅 |
