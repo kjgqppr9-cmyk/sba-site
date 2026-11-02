@@ -1594,6 +1594,11 @@ function applyPick(){
     li.classList.toggle("lit", !!calPick && k === calPick);
   });
 }
+/* 개인 일정 — 칸 한 개의 실제 폭을 --psd 로 넘긴다(캡슐 크기의 기준, css .psbar). */
+function psFit(grid){
+  const c = grid.querySelector(".cd:not(.pad)");
+  if(c && c.offsetWidth) grid.style.setProperty("--psd", c.offsetWidth + "px");
+}
 function renderSched(dir){
   if(!MONTHS.length) return;
   calInit();
@@ -1663,11 +1668,17 @@ function renderSched(dir){
     }
     if(n < 2) continue;
     const row = 2 + Math.floor((first + d - 1) / 7);
-    h += '<i class="psbar" aria-hidden="true" style="grid-column:'+(dow+1)+' / span '+n+';grid-row:'+row+' / span 1;--n:'+n+'"><i></i></i>';
+    h += '<i class="psbar" aria-hidden="true" style="grid-column:'+(dow+1)+' / span '+n+';grid-row:'+row+' / span 1;--n:'+n+'"><i class="pb"></i></i>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
   grid.innerHTML = h;
+  psFit(grid);
+  if(!grid.__psro){
+    grid.__psro = true;
+    if(window.ResizeObserver) new ResizeObserver(function(){ psFit(grid); }).observe(grid);
+    else window.addEventListener("resize", function(){ psFit(grid); });
+  }
   /* 다리는 달력이 처음 화면에 들어올 때 왼쪽에서 오른쪽으로 차오른다(한 번 켜지면 달을 넘겨도 바로 그린다) */
   if(grid.querySelector(".psbar") && !grid.classList.contains("psgo") && !grid.__psio){
     if(reduced() || !("IntersectionObserver" in window)) grid.classList.add("psgo");
