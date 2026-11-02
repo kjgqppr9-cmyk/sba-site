@@ -978,11 +978,155 @@ const LECTURES = [
 - 컨설팅 보고서는 실시일로부터 2주 이내 제공
 `
   },
+  /* 3차 — 두 과정 동시 모집 (2026-11-02 대표님). 2차 네 번의 과정을 하루(13~20시)에 몰아서 진행.
+     하루 과정이라 달력 칸은 sessions 한 개, 카드 커리큘럼은 parts(1부~4부, 2차 회차 내용 그대로)로 그린다.
+     pick = 아래 신청 폼 PROGRAMS 의 값 — 히어로 · 카드의 신청 단추가 이 과정을 미리 골라 준다. */
+  {
+    id:"mfs-3", title:"마켓-핏 스케일러", edition:"3차", status:"auto", pick:"마켓핏3",
+    host:"상지대학교 창업보육센터",
+    summary:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · 구매전환 · 광고 세팅)을 하루에 집중해서 진행합니다. 1차 수강생 만족도 5.0의 과정입니다.",
+    summaryHtml:"2차 네 번의 과정(PMF 진단 · 경쟁 지도 · <br class=\"m\">구매전환 · 광고 세팅)을 <br class=\"m\">하루에 집중해서 진행합니다.<br class=\"pc\"> "
+        + "<br class=\"m\">1차 수강생 만족도 5.0의 과정입니다.",
+    apply:{from:"2026-11-02", to:"2026-11-09"},
+    pitch:{
+      kicker:"전 과정 AI 실습 · 입주기업 마케팅 + 매출 성장 프로그램<i class=\"pcd\"> · </i><br class=\"m\">하루 7시간",
+      head:"제품은 좋은데,<br>왜 안 팔릴까?",
+      sub:"그 이유를 찾아내고 팔리게끔 바꾸는 <b>하루 7시간</b>"
+    },
+    info:{
+      when:"11월 11일(수) <em>하루 과정</em>",
+      time:"오후 1시 ~ 8시 <em>(7시간)</em>",
+      place:"상지대학교 창업보육관<br class=\"pc\"> 3층 라운지"
+    },
+    prep:["노트북 지참", "AI 유료 구독 <small>(Claude 또는 ChatGPT)</small>"],
+    note:"수료 후 <b>1:1 컨설팅</b>이 사업장 방문으로 이어집니다. 접수하신 분께는 <b>개별 연락</b>을 드립니다.",
+    perk:"수료한 팀 중 <b>2팀</b>을 선정해 마케팅·홍보에 쓸 수 있는 "
+        + "<b>100만 원 상당 솔루션</b>을 지원합니다.",
+    sessions:[
+      {date:"2026-11-11", n:1, title:"2차 네 번의 과정을 하루에 — 1부 ~ 4부",
+       tag:"PMF 진단 · 경쟁 지도 · 구매전환 · 광고 실전 세팅", do:"진단서 · 경쟁 지도 · 상세페이지 카피 · 광고문안"}
+    ],
+    parts:[
+      {title:"우리 제품, 정말 시장에 맞습니까", tag:"PMF 진단", do:"AI로 우리 제품 진단서 만들기"},
+      {title:"어디서 싸울지부터 정합니다", tag:"시장 조사 · 경쟁 지도 · 포지셔닝",
+       do:"AI로 경쟁 지도 그려 안 싸우고 이길 자리 찾기"},
+      {title:"보고도 안 사는 이유", tag:"구매전환율을 올리는 심리 기술", do:"AI로 상세페이지·카피 다시 쓰기"},
+      {title:"이제 데려옵니다", tag:"광고 실전 세팅", do:"AI로 키워드·광고문안 뽑아 바로 집행"}
+    ],
+    hours:7, capacity:null, enrolled:0,
+    rating:null, ratingCount:0,
+    reviews:[],
+    detail:`
+## 제품은 좋은데, 왜 안 팔릴까
+그 이유를 찾아내고 **팔리게끔 바꾸는 하루 7시간**입니다. 2차 네 번의 과정을 **하루에 집중해서** 진행합니다. 전 과정 AI 실습입니다.
+
+## 한눈에
+| | |
+| --- | --- |
+| **일시** | 11월 11일(수) · 하루 과정 |
+| **시간** | 오후 1시 ~ 8시 (7시간) |
+| **장소** | 상지대학교 창업보육관 3층 라운지 |
+| **모집** | 11월 2일(월) ~ 11월 9일(월) |
+
+## 커리큘럼 (하루 안에 1부 ~ 4부)
+| 순서 | 교육 주제 | 그 시간에 만드는 것 |
+| --- | --- | --- |
+| 1부 | 우리 제품, 정말 시장에 맞습니까 — PMF 진단 | AI로 우리 제품 진단서 만들기 |
+| 2부 | 어디서 싸울지부터 정합니다 — 시장 조사·경쟁 지도·포지셔닝 | AI로 경쟁 지도 그려 안 싸우고 이길 자리 찾기 |
+| 3부 | 보고도 안 사는 이유 — 구매전환율을 올리는 심리 기술 | AI로 상세페이지·카피 다시 쓰기 |
+| 4부 | 이제 데려옵니다 — 광고 실전 세팅 | AI로 키워드·광고문안 뽑아 바로 집행 |
+
+## 수료 후
+- 수료한 팀 중 **2팀**을 선정해 마케팅·홍보에 쓸 수 있는 **100만 원 상당 솔루션**을 지원합니다
+- **1:1 컨설팅**이 사업장 방문으로 이어집니다
+
+## 준비하실 것
+- **노트북 지참**(필수) · 전 과정 실습형입니다
+- **AI 도구 유료 구독**(필수) — Claude 또는 ChatGPT 유료 플랜
+`
+  },
+  {
+    id:"omni-3", title:"옴니채널 브랜딩 빌드업", edition:"3차", status:"auto", pick:"옴니채널3",
+    host:"상지대학교 창업보육센터",
+    summary:"2차 네 번의 과정을 하루에 집중해서 진행합니다. 브랜드 메시지를 정리하고, AI로 카피 · 이미지 · 숏폼을 직접 만들어 흩어진 채널을 하나의 운영 체계로 묶습니다.",
+    summaryHtml:"2차 네 번의 과정을 <br class=\"m\">하루에 집중해서 진행합니다.<br class=\"pc\"> "
+        + "<br class=\"m\">브랜드 메시지를 정리하고, AI로 카피 · 이미지 · 숏폼을 <br class=\"m\">직접 만들어 흩어진 채널을 <br class=\"m\">하나의 운영 체계로 묶습니다.",
+    apply:{from:"2026-11-02", to:"2026-11-09"},
+    pitch:{
+      kicker:"전 과정 AI 실습 · 입주기업 브랜딩 프로그램<i class=\"pcd\"> · </i><br class=\"m\">하루 7시간",
+      head:"채널마다 다른 우리 브랜드,<br>하나로 묶습니다",
+      sub:"말투 · 그림 · 영상이 <b>한 브랜드</b>로 보이게 만드는 하루"
+    },
+    info:{
+      when:"11월 13일(금) <em>하루 과정</em>",
+      time:"오후 1시 ~ 8시 <em>(7시간)</em>",
+      place:"상지대학교 창업보육관<br class=\"pc\"> 3층 라운지"
+    },
+    prep:["노트북 지참", "AI 유료 구독 <small>(Claude 또는 ChatGPT)</small>"],
+    note:"수료 후 <b>1:1 맞춤형 컨설팅</b>이 사업장 방문으로 이어집니다. 접수하신 분께는 <b>개별 연락</b>을 드립니다.",
+    perk:"수료한 팀 중 <b>2팀</b>을 선정해 마케팅·홍보에 쓸 수 있는 "
+        + "<b>100만 원 상당 솔루션</b>을 지원합니다.",
+    sessions:[
+      {date:"2026-11-13", n:1, title:"2차 네 번의 과정을 하루에 — 1부 ~ 4부",
+       tag:"브랜드 아이덴티티 · AI 카피 · 이미지 · 숏폼 · 통합 운영", do:"브랜드 가이드 · 콘텐츠 캘린더 · 숏폼 기획안 · 통합 운영안"}
+    ],
+    parts:[
+      {title:"브랜드 아이덴티티 및 옴니채널 전략 수립", tag:"브랜드 가이드", do:"우리 브랜드를 한 장의 정체성 문서로 정리합니다"},
+      {title:"AI 카피라이팅 · SNS 콘텐츠 기획 및 AI 이미지 제작",
+       tag:"콘텐츠 캘린더 · 채널별 운영안", do:"AI 로 채널별 카피와 이미지를 직접 뽑습니다"},
+      {title:"AI 이미지 제작 심화 및 영상 · 숏폼 트렌드 시연",
+       tag:"비주얼 제작안 · 숏폼 기획안", do:"브랜드 톤에 맞는 이미지와 숏폼 기획안을 만듭니다"},
+      {title:"옴니채널 통합 운영 및 성과 분석",
+       tag:"통합 운영안", do:"채널을 하나의 운영 체계로 묶고 성과 보는 법을 익힙니다"}
+    ],
+    hours:7, capacity:null, enrolled:0,
+    rating:null, ratingCount:0,
+    reviews:[],
+    detail:`
+## 이런 분을 위한 교육입니다
+- 채널마다 **말투와 분위기가 제각각**인 사장님
+- 만들 때마다 **매번 다른 그림**이 나와 답답한 사장님
+- 만드는 법이 아니라 **교육 중에 실제 콘텐츠**를 뽑아 가고 싶은 사장님
+
+## 한눈에
+| | |
+| --- | --- |
+| **일시** | 11월 13일(금) · 하루 과정 |
+| **시간** | 오후 1시 ~ 8시 (7시간) |
+| **장소** | 상지대학교 창업보육관 3층 라운지 |
+| **모집** | 11월 2일(월) ~ 11월 9일(월) |
+
+## 커리큘럼 (2차 네 번의 과정을 하루에 · 1부 ~ 4부)
+| 순서 | 교육 주제 | 손에 남는 것 |
+| --- | --- | --- |
+| 1부 | 브랜드 아이덴티티 및 옴니채널 전략 수립 | 브랜드 가이드 |
+| 2부 | AI 카피라이팅 · SNS 콘텐츠 기획 및 AI 이미지 제작 | 옴니채널 콘텐츠 캘린더 · 채널별 콘텐츠 운영안 |
+| 3부 | AI 이미지 제작 심화 및 영상 · 숏폼 트렌드 시연 | 비주얼 콘텐츠 제작안 · 숏폼 콘텐츠 기획안 |
+| 4부 | 옴니채널 통합 운영 및 성과 분석 | 옴니채널 통합 운영안 |
+
+## 수료 후
+- 수료한 팀 중 **2팀**을 선정해 마케팅·홍보에 쓸 수 있는 **100만 원 상당 솔루션**을 지원합니다
+- **1:1 맞춤형 컨설팅** · 사업장 방문 원칙 · 일정은 교육 종료 후 개별 안내
+
+## 준비하실 것
+- **노트북 지참**(필수) · 전 과정 실습형입니다
+- **AI 도구 유료 구독**(필수) — Claude 또는 ChatGPT 유료 플랜
+`
+  },
   /* 개인 일정 — 달력에 코랄 동그라미만 찍힌다(이어진 날은 다리로 연결). 이름은 '개인 일정' 뿐,
      장소 · 내용 · 신청 없음. 강의 목록 · 다음 개강 · 히어로 전환 · 상세 창에는 나오지 않는다.
      쓰는 법: {id, kind:"personal", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
   {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"}
 ];
+
+/* 동시 모집 히어로 — 신청할 수 있는 강의가 둘 이상일 때 강의 히어로에 나가는 문구(적지 않은 칸은 자동).
+   하나뿐일 때는 쓰이지 않는다. 다음 동시 모집 때 문구만 바꾸면 된다. (2026-11-02 대표님: 3차 두 과정 동시 모집) */
+const HERO_MULTI = {
+  title:"3차 두 과정을\n동시에 모집합니다",
+  lead:"2차 네 번의 과정을 <b>하루에 집중해서</b> 진행합니다.",
+  chips:["전 과정 실습", "하루 7시간 집중", "진단서 · 광고문안 · 브랜드 가이드"],
+  meta:"과정마다 수료 2팀 100만 원 상당 솔루션 지원"
+};
 
 const APPLY_ANCHOR = "sba-apply";
 const APPLY_FALLBACK = "/qna/form";
@@ -1461,6 +1605,16 @@ function wireNet(){
    남은 자리 수는 안 보여 준다. 초반에 '17석 중 17석 남음'이 뜨면
    아무도 신청 안 한 강의처럼 보여서 오히려 신청을 막는다. */
 function curriculum(l){
+  /* 하루 과정(parts) — 회차 날짜 대신 1부 · 2부 … 순서만 적는다(세부 시각은 정해지지 않음) */
+  if(l.parts) return '<ul class="cur">' + l.parts.map(function(s, i){
+    return '<li>'
+      + '<span class="no">' + p2(i + 1) + '</span>'
+      + '<span class="ti">' + (s.titleHtml || esc(s.title))
+      + (s.tag ? ' <em><span class="dash">— </span>' + (s.tagHtml || esc(s.tag)) + '</em>' : "") + '</span>'
+      + '<span class="dt">' + (i + 1) + '부</span>'
+      + (s.do ? '<span class="doit">' + (s.doHtml || esc(s.do)) + '</span>' : "")
+      + '</li>';
+  }).join("") + '</ul>';
   return '<ul class="cur">' + l.sessions.map(function(s){
     return '<li>'
       + '<span class="no">' + p2(s.n) + '</span>'
@@ -1539,7 +1693,8 @@ function renderOpen(){
       <div class="oc-sum">${l.summaryHtml || esc(l.summary)}</div>
       <div class="oc-facts">
         ${first?`<span>개강 <b>${fmtw(first.date)}</b></span>`:""}
-        <span>총 <b>${l.sessions.length||"—"}회차${l.hours?` · ${l.hours}시간`:""}</b></span>
+        ${l.parts ? `<span>하루 <b>${l.parts.length}부${l.hours?` · ${l.hours}시간`:""}</b></span>`
+                  : `<span>총 <b>${l.sessions.length||"—"}회차${l.hours?` · ${l.hours}시간`:""}</b></span>`}
         ${l.apply?`<span>모집 <b>${fmtw(l.apply.from)} ~ ${fmtw(l.apply.to)}</b></span>`:""}
       </div>
       <div class="oc-pitch">
@@ -1554,7 +1709,7 @@ function renderOpen(){
       ${l.perk?`<div class="oc-perk"><span class="pk">수료 혜택</span><div class="pb">${l.perk}</div></div>`:""}
       <div class="oc-act">
         ${sg ? `<button class="btn wide" data-signup="${esc(l.id)}">신청서 쓰기 <i>→</i></button>`
-             : `<button class="btn wide" data-apply>신청하기 <i>↓</i></button>`}
+             : `<button class="btn wide" data-apply${l.pick ? ` data-pick="${esc(l.pick)}"` : ""}>신청하기 <i>↓</i></button>`}
       </div></div>`;
   }).join("");
 }
@@ -1873,6 +2028,7 @@ function onClick(e){
   if(e.target.closest("[data-sg-login]")){ sgGoLogin(e.target.closest("[data-sg-login]").getAttribute("data-sg-login")); return; }
   if(e.target.closest("[data-apply]")){
     closeLec();
+    pickProgram(e.target.closest("[data-apply]").getAttribute("data-pick"));
     const form = document.querySelector("#" + APPLY_ANCHOR);
     if(form) form.scrollIntoView({behavior:"smooth",block:"start"});
     else location.href = APPLY_FALLBACK;
@@ -2249,30 +2405,70 @@ if(!fixApplyForm()){
       강의 객체에 hero:{eyebrow,title,subtitle,chips:[3개],meta,cta} 를 적으면 그 값을, 없으면 강의 정보로 만든다.
    ② 없으면 → 설정값 그대로 + 「다음 기수 알림 받기」·「기관 · 기업 강의 문의」 두 단추.
       두 단추는 신청 폼의 늘 열린 항목('다음기수알림' · '강의문의')을 미리 골라 준다. */
+/* 신청 폼(다른 블록)에서 과정 하나를 미리 고른다 — 히어로 단추 · 모집 카드 단추가 쓴다. 고를 수 없는 값이면 그대로 둔다 */
+function pickProgram(v){
+  const sel = document.querySelector("#sba-apply select[name=\"program\"]");
+  if(!v || !sel) return false;
+  const opt = Array.prototype.find.call(sel.options, o => o.value === v && !o.disabled);
+  if(!opt) return false;
+  sel.value = v;
+  sel.dispatchEvent(new Event("change", {bubbles:true}));
+  return true;
+}
+const sdw = s => { const d = parse(s); return (d.getMonth()+1) + "/" + d.getDate() + "(" + WD[d.getDay()] + ")"; };
 function heroSync(){
   const host = document.querySelector(".lhx");
   if(!host || !host.querySelector(".lhx-act .lhx-cta")) return false;
   const act = host.querySelector(".lhx-act"), cta = act.querySelector(".lhx-cta");
-  const open = LECTURES.filter(l => ((l.signup && !l.paid) ? sgOpen(l) : l.status === "open") && !l.kind)
-                       .sort((a,b) => a.sessions[0].date < b.sessions[0].date ? -1 : 1)[0];
-  const key = open ? "open:" + open.id : "idle";
+  const opens = LECTURES.filter(l => ((l.signup && !l.paid) ? sgOpen(l) : l.status === "open") && !l.kind)
+                        .sort((a,b) => a.sessions[0].date < b.sessions[0].date ? -1 : 1);
+  const open = opens[0];
+  const endOf = l => sgOpen(l) ? sgEnd(l) : (l.apply && l.apply.to);
+  const nameOf = l => l.title + (l.edition ? " " + l.edition : "");
+  const key = opens.length > 1 ? "multi:" + opens.map(l => l.id).join(",") : open ? "open:" + open.id : "idle";
   if(host.dataset.sbaHero !== key){
     host.dataset.sbaHero = key;
     let cta2 = act.querySelector(".lhx-cta2");
-    if(open){
+    act.querySelectorAll(".lhx-ctaB").forEach(b => b.remove());
+    act.classList.toggle("lhx-two", opens.length > 1);
+    const set = (sel, v, html) => { const el = host.querySelector(sel); if(el && v != null){ if(html) el.innerHTML = v; else el.textContent = v; } };
+    const setChips = chips => { if(chips){ host.querySelectorAll(".lhx-chip").forEach((c,i) => { if(chips[i] != null){ const b = c.querySelector("b"); c.innerHTML = (b ? b.outerHTML : "") + esc(chips[i]); c.__cc = false; } }); } };
+    if(opens.length > 1){
+      /* ③ 동시 모집 — 공통 문구 + 강의마다 신청 단추(그 과정을 신청 폼에서 미리 고른다) */
+      const h = HERO_MULTI || {};
+      const eds = opens.map(l => l.edition || "");
+      const sameEd = eds[0] && eds.every(e => e === eds[0]);
+      const ends = opens.map(endOf).filter(Boolean).sort();
+      const endD = ends[0];
+      set(".lhx-eye", h.eyebrow || ((sameEd ? eds[0] : opens.length + "개 과정") + " 동시 모집" + (endD ? " · " + sdw(endD) + " 마감" : "")));
+      const ti = host.querySelector(".lhx-title");
+      if(ti){ ti.textContent = h.title || opens.map(l => l.title).join("\n"); ti.__cc = false; }
+      const lines = opens.map(l => "<b>" + fmtw(l.sessions[0].date) + "</b> " + esc(nameOf(l)));
+      set(".lhx-sub", h.subtitle || [h.lead].concat(lines, [(opens.length === 2 ? "두" : opens.length + "개") + " 과정을 함께 신청할 수 있습니다."]).filter(Boolean).join("\n"), true);
+      setChips(h.chips);
+      set(".lhx-meta", (endD ? "모집 ~ " + fmtw(endD) + " · " : "") + (h.meta || ("교육 " + opens.map(l => fmtw(l.sessions[0].date)).join(" · "))));
+      if(cta2) cta2.remove();
+      opens.forEach((l, i) => {
+        const b = i === 0 ? cta : document.createElement("button");
+        if(i > 0){ b.className = "lhx-cta lhx-ctaB"; b.setAttribute("data-go", "apply"); act.appendChild(b); }
+        b.textContent = nameOf(l) + " 신청 · " + sdw(l.sessions[0].date);
+        b.removeAttribute("data-sg");
+        if(sgOpen(l)) b.setAttribute("data-sg", l.id);
+        if(l.pick) b.setAttribute("data-pick", l.pick); else b.removeAttribute("data-pick");
+      });
+    } else if(open){
       const h = open.hero || {};
-      const name = open.title + (open.edition ? " " + open.edition : "");
-      const set = (sel, v, html) => { const el = host.querySelector(sel); if(el && v != null){ if(html) el.innerHTML = v; else el.textContent = v; } };
+      const name = nameOf(open);
       set(".lhx-eye", h.eyebrow || ("스몰브랜드설계자 · " + name + " 모집 중"));
       const ti = host.querySelector(".lhx-title");
       if(ti){ ti.textContent = h.title || open.title; ti.__cc = false; }   /* 히어로 스크립트가 '클로드 코드' 를 다시 감쌀 수 있게 */
       set(".lhx-sub", h.subtitle || open.summary, true);
-      if(h.chips){ host.querySelectorAll(".lhx-chip").forEach((c,i) => { if(h.chips[i] != null){ const b = c.querySelector("b"); c.innerHTML = (b ? b.outerHTML : "") + esc(h.chips[i]); c.__cc = false; } }); }
+      setChips(h.chips);
       const first = open.sessions[0];
-      const endD = sgOpen(open) ? sgEnd(open) : (open.apply && open.apply.to);
+      const endD = endOf(open);
       set(".lhx-meta", h.meta || ((endD ? "모집 ~ " + fmtw(endD) + " · " : "") + "교육 " + (first ? fmtw(first.date) : "")));
       cta.textContent = h.cta || (name + " 신청하기");
-      cta.removeAttribute("data-pick");
+      if(open.pick) cta.setAttribute("data-pick", open.pick); else cta.removeAttribute("data-pick");
       if(sgOpen(open)) cta.setAttribute("data-sg", open.id); else cta.removeAttribute("data-sg");
       if(cta2) cta2.remove();
     } else {
@@ -2299,13 +2495,7 @@ function heroSync(){
       const b = e.target.closest("[data-go=\"apply\"]");
       if(!b) return;
       /* 폼까지 내려가는 것은 히어로 스크립트가 [data-go="apply"] 로 해 준다 — 여기서는 항목만 고른다 */
-      const v = b.getAttribute("data-pick");
-      const sel = document.querySelector("#sba-apply select[name=\"program\"]");
-      if(!v || !sel) return;
-      const opt = Array.prototype.find.call(sel.options, o => o.value === v && !o.disabled);
-      if(!opt) return;
-      sel.value = v;
-      sel.dispatchEvent(new Event("change", {bubbles:true}));
+      pickProgram(b.getAttribute("data-pick"));
     });
   }
   return true;

@@ -615,6 +615,11 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .lhx .lhx-act .lhx-cta2:hover{border-color:#7FE0BE;background:rgba(127,224,190,.08);transform:translateY(-3px)}
 @media (max-width:767px){.lhx .lhx-act .lhx-cta2{display:block;width:100%;margin:10px 0 0;padding:15px;border-radius:16px;font-size:15px}}
 @media (prefers-reduced-motion:reduce){.lhx .lhx-act .lhx-cta2{transition:none}}
+/* 동시 모집 — 강의마다 금색 신청 단추를 세로로 (lecture.js heroSync, 2026-11-02) */
+.lhx .lhx-act.lhx-two{display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+.lhx .lhx-act.lhx-two .lhx-cta{margin:0;padding:16px 32px;font-size:16px}
+@media (min-width:768px){.lhx .lhx-act.lhx-two .lhx-cta{min-width:360px}}
+@media (max-width:767px){.lhx .lhx-act.lhx-two{align-items:stretch;gap:10px}.lhx .lhx-act.lhx-two .lhx-cta{width:100%;padding:15px 12px;font-size:15px}}
 
 /* 무료 · 초청 · 용역 강의 신청서 (커스텀 DB lecture-apply) — lecture.js sgShow (2026-10-30) */
 .slp .sg-tag{display:inline-flex;align-items:center;font-size:12.5px;font-weight:800;color:var(--green);background:var(--mint);border-radius:99px;padding:4px 10px;letter-spacing:-.01em}
