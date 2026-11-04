@@ -1927,9 +1927,9 @@ function renderSched(dir){
       if(!PDAYS[kk] || IDX[kk]) break;
       n++;
     }
-    if(n < 2) continue;
+    /* 하루짜리도 같은 테두리 원(이중 원)을 두른다 — n=1 이면 캡슐이 원이 된다 (11/4 대표님) */
     const row = 2 + Math.floor((first + d - 1) / 7);
-    h += '<i class="psbar" aria-hidden="true" style="grid-column:'+(dow+1)+' / span '+n+';grid-row:'+row+' / span 1;--n:'+n+'"><i class="pb"></i></i>';
+    h += '<i class="psbar'+(n === 1 ? ' one' : '')+'" aria-hidden="true" style="grid-column:'+(dow+1)+' / span '+n+';grid-row:'+row+' / span 1;--n:'+n+'"><i class="pb"></i></i>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");

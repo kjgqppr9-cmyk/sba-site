@@ -660,6 +660,9 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   height:var(--psd);margin-top:calc(var(--psd) / -2);border-radius:999px;background:#F9E6DE;border:1.5px solid #D97757;
   box-sizing:border-box;transform-origin:left center}
 .slp .calgrid.psgo .psbar>.pb{animation:psUnroll .9s .2s cubic-bezier(.3,.75,.25,1) both}
+.slp .psbar.one>.pb{transform-origin:center}
+.slp .calgrid.psgo .psbar.one>.pb{animation-name:psPop}
+@keyframes psPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
 @keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
 .slp .cd.ps{z-index:1;isolation:isolate;color:#fff;font-weight:800}
 .slp .cd.ps.sun,.slp .cd.ps.sat{color:#fff}
