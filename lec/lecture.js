@@ -1219,7 +1219,8 @@ const LECTURES = [
   /* 개인 일정 — 달력에 코랄 동그라미만 찍힌다(이어진 날은 다리로 연결). 이름은 '개인 일정' 뿐,
      장소 · 내용 · 신청 없음. 강의 목록 · 다음 개강 · 히어로 전환 · 상세 창에는 나오지 않는다.
      쓰는 법: {id, kind:"personal", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
-  {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"}
+  {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"},
+  {id:"personal-1222", kind:"personal", from:"2026-12-22"}
 ];
 
 /* 동시 모집 히어로 — 신청할 수 있는 강의가 둘 이상일 때 강의 히어로에 나가는 문구(적지 않은 칸은 자동).
