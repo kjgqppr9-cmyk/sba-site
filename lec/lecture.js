@@ -2143,35 +2143,48 @@ function gNoise(x, y, s){
 }
 function gSm(v){ return v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v); }
 const goldCache = {};
-function goldTex(Wc, S){
-  const key = Wc + "_" + S;
+/* 이음매 없는 타일(2026-11-14 s1114tp2 — '액체 금이 천천히 흐르는' 루프): 노이즈 격자를 타일 주기로 감는다(gNoiseP).
+   결 방향은 정수 기울기 (3,-2)(약 34°, 덱 .61rad 와 비슷) · 가로지름 (2,3) — 정수라 타일을 한 번 지나면 격자가 정수만큼 밀려 딱 맞는다.
+   금 입자 칸 크기도 타일을 정수로 나눈 값. 그래서 background-position 을 타일 크기만큼 옮기면 0% 와 100% 화면이 같다. */
+const GOLD_T = 128;
+function gNoiseP(x, y, s, px, py){
+  const ix = Math.floor(x), iy = Math.floor(y); let fx = x - ix, fy = y - iy;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+  const m = (v, p) => ((v % p) + p) % p, x0 = m(ix, px), x1 = m(ix + 1, px), y0 = m(iy, py), y1 = m(iy + 1, py);
+  const a = gHash(x0, y0, s), b = gHash(x1, y0, s), c = gHash(x0, y1, s), d = gHash(x1, y1, s);
+  return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+}
+function goldTex(T, S){
+  const key = T + "_" + S;
   if(goldCache[key] !== undefined) return goldCache[key];
   let url = "";
   try{
-    const n = Math.round(Wc * S), cv = document.createElement("canvas");
+    const n = Math.round(T * S), cv = document.createElement("canvas");
     cv.width = cv.height = n;
     const ctx = cv.getContext("2d"), img = ctx.createImageData(n, n), px = img.data, sd = 0x5BA1;
     const s1 = sd ^ 0x51ED, s2 = sd ^ 0x1B56, s3 = sd ^ 0x7F4A, s4 = sd ^ 0x2C1B, s5 = sd ^ 0x3A91, s6 = sd ^ 0x6E07, s7 = sd ^ 0x4D33, s8 = sd ^ 0x0B6F;
-    const co = Math.cos(.61), si = Math.sin(.61), cA = 1.2, cB = 2.2;
+    const R = Math.sqrt(13), K = f => Math.max(1, Math.round(f * T / R)), KX = f => Math.max(1, Math.round(f * T));
+    const kP1 = K(.32), kP2 = 2, kX1 = KX(.92), kX2 = KX(2.3), kGa = K(.06), kGb = K(1.4), kTa = 1, kTb = K(.25), kUb = K(.45), kUa = 1;
+    const NA = Math.round(T / 1.2), cA = T / NA, NB = Math.round(T / 2.2), cB = T / NB, w = v => ((v % NA) + NA) % NA, wb = v => ((v % NB) + NB) % NB;
     for(let y = 0; y < n; y++){
       const Y = y / S;
       for(let x = 0; x < n; x++){
-        const X = x / S, a = X * co - Y * si, b = X * si + Y * co;   /* a = 결을 따라(오른쪽 위로), b = 결을 가로질러 */
-        const P = .84 + .28 * (gNoise(b * .32, a * .035, s1) - .5);   /* 한 번 한 번 그은 띠마다 누르는 힘이 다르다 */
-        const g = .40 * gNoise(X * .92, Y * .92, s6) + .18 * gNoise(X * 2.3, Y * 2.3, s7) + .42 * gNoise(a * .06, b * 1.4, s8);
-        const cov = Math.max(gSm((P - g * 1.2 + .08) / .16), .35);   /* 종이 골에는 덜 묻는다 — 엷은 왁스 막은 남는다 */
-        let tone = .70 + .10 * (1 - (X + Y) / Wc) + .12 * (gNoise(a * .03, b * .25, s2) - .5) + .18 * (gNoise(b * .45, a * .04, s3) - .5) + (.5 - g) * .26;
+        const X = x / S, A = (3 * X - 2 * Y) / T, B = (2 * X + 3 * Y) / T;   /* A = 결을 따라, B = 결을 가로질러(타일 한 바퀴에 정수) */
+        const P = .84 + .28 * (gNoiseP(B * kP1, A * kP2, s1, kP1, kP2) - .5);
+        const g = .40 * gNoiseP(X * kX1 / T, Y * kX1 / T, s6, kX1, kX1) + .18 * gNoiseP(X * kX2 / T, Y * kX2 / T, s7, kX2, kX2) + .42 * gNoiseP(A * kGa, B * kGb, s8, kGa, kGb);
+        const cov = Math.max(gSm((P - g * 1.2 + .08) / .16), .35);
+        let tone = .70 + .08 * Math.cos(2 * Math.PI * (X + Y) / T) + .12 * (gNoiseP(A * kTa, B * kTb, s2, kTa, kTb) - .5) + .18 * (gNoiseP(B * kUb, A * kUa, s3, kUb, kUa) - .5) + (.5 - g) * .26;
         let lo = .58;
-        let ci = Math.floor(X / cA), cj = Math.floor(Y / cA), fr = gHash(ci, cj, s2);
+        let ci = Math.floor(X / cA), cj = Math.floor(Y / cA), hi = w(ci), hj = w(cj), fr = gHash(hi, hj, s2);
         if(fr < .16 || fr > .88){
-          const dx = X / cA - ci - (.25 + .5 * gHash(ci, cj, s3)), dy = Y / cA - cj - (.25 + .5 * gHash(ci, cj, s4)), r = .22 + .28 * gHash(ci, cj, s5);
+          const dx = X / cA - ci - (.25 + .5 * gHash(hi, hj, s3)), dy = Y / cA - cj - (.25 + .5 * gHash(hi, hj, s4)), r = .22 + .28 * gHash(hi, hj, s5);
           if(dx * dx + dy * dy < r * r){
             if(fr < .015) tone = 1; else if(fr < .06) tone += .30; else if(fr < .16) tone += .14; else { tone -= .12; lo = .55; }
           }
         }
-        ci = Math.floor(X / cB); cj = Math.floor(Y / cB); fr = gHash(ci, cj, s6);
+        ci = Math.floor(X / cB); cj = Math.floor(Y / cB); hi = wb(ci); hj = wb(cj); fr = gHash(hi, hj, s6);
         if(fr < .06){
-          const cx = (ci + .3 + .4 * gHash(ci, cj, s7)) * cB, cy = (cj + .3 + .4 * gHash(ci, cj, s8)) * cB, r = (.20 + .22 * gHash(ci, cj, s1)) * cB;
+          const cx = (ci + .3 + .4 * gHash(hi, hj, s7)) * cB, cy = (cj + .3 + .4 * gHash(hi, hj, s8)) * cB, r = (.20 + .22 * gHash(hi, hj, s1)) * cB;
           if((X - cx) * (X - cx) + (Y - cy) * (Y - cy) < r * r) tone = fr < .025 ? 1 : tone + .26;
         }
         tone = tone < lo ? lo : tone > 1 ? 1 : tone;
@@ -2187,13 +2200,45 @@ function goldTex(Wc, S){
   }catch(e){ url = ""; }
   return (goldCache[key] = url);
 }
+/* 금가루 반짝임 타일 — 투명 바탕에 작은 빛 알갱이 · 십자 반짝임 몇 개. 타일 가장자리를 넘는 알갱이는 반대편에도 그려 이음매가 없다.
+   질감과 같은 타일 · 같은 흐름으로 움직이고, 층 전체가 흐름 주기의 절반마다 생겼다 사라진다(CSS gTw). */
+function goldSpk(T, S){
+  const key = "spk_" + T + "_" + S;
+  if(goldCache[key] !== undefined) return goldCache[key];
+  let url = "";
+  try{
+    const n = Math.round(T * S), cv = document.createElement("canvas");
+    cv.width = cv.height = n;
+    const c = cv.getContext("2d"), sd = 0x2E9D;
+    for(let i = 0; i < 16; i++){
+      const x = gHash(i, 1, sd) * T, y = gHash(i, 2, sd) * T, big = i < 4, r = big ? 2.2 + gHash(i, 3, sd) : .8 + .9 * gHash(i, 3, sd);
+      for(const ox of [-T, 0, T]) for(const oy of [-T, 0, T]){
+        const X = (x + ox) * S, Y = (y + oy) * S, Rr = r * S;
+        if(X < -4 * Rr || Y < -4 * Rr || X > n + 4 * Rr || Y > n + 4 * Rr) continue;
+        const g = c.createRadialGradient(X, Y, 0, X, Y, Rr);
+        g.addColorStop(0, "rgba(255,255,255,.95)"); g.addColorStop(.35, "rgba(255,244,205,.8)"); g.addColorStop(1, "rgba(255,226,140,0)");
+        c.fillStyle = g; c.beginPath(); c.arc(X, Y, Rr, 0, 7); c.fill();
+        if(big){
+          c.strokeStyle = "rgba(255,250,232,.75)"; c.lineWidth = .6 * S; c.lineCap = "round";
+          c.beginPath(); c.moveTo(X - 2.4 * Rr, Y); c.lineTo(X + 2.4 * Rr, Y); c.moveTo(X, Y - 2.4 * Rr); c.lineTo(X, Y + 2.4 * Rr); c.stroke();
+        }
+      }
+    }
+    url = cv.toDataURL("image/png");
+  }catch(e){ url = ""; }
+  return (goldCache[key] = url);
+}
 function goldFit(w){
-  const h = hostEl(), Wc = Math.max(16, Math.round(w)), S = Math.min(2, Math.max(1, Math.ceil(window.devicePixelRatio || 1)));
-  if(!h || h.__gold === Wc + "_" + S) return;
-  const url = goldTex(Wc, S);
-  if(!url) return;   /* 못 구우면 CSS 의 금색 그라데이션이 그대로 남는다 */
-  h.__gold = Wc + "_" + S;
+  const h = hostEl(), S = Math.min(2, Math.max(1, Math.ceil(window.devicePixelRatio || 1)));
+  if(!h || h.__gold === GOLD_T + "_" + S) return;
+  const url = goldTex(GOLD_T, S);
+  if(!url) return;   /* 못 구우면 CSS 의 금색 그라데이션이 그대로 남는다(흐름 없음) */
+  h.__gold = GOLD_T + "_" + S;
   h.style.setProperty("--gcr", 'url("' + url + '")');
+  h.style.setProperty("--gts", GOLD_T + "px " + GOLD_T + "px");
+  h.style.setProperty("--gan", "gFlow 20s linear infinite");
+  const sp = goldSpk(GOLD_T, S);
+  if(sp) h.style.setProperty("--gsp", 'url("' + sp + '")');
 }
 function renderSched(dir){
   if(!MONTHS.length) return;
@@ -2254,6 +2299,7 @@ function renderSched(dir){
     /* 캡슐 칸: 기간 일정이 그 날을 지나가면 대표가 강의여도 캡슐은 잇는다(대표 모양은 원판 크기로 캡슐 안에, .pmx).
        하루짜리(줄 길이 1) 기간 일정이 대표가 아니면 캡슐 없이 작은 기호로만. */
     const inCap = !!c && (!!main.ps || psSeg[k] !== 1);
+    const mtg = main.kind === "fs" ? '<i class="cal-mtg" aria-hidden="true"></i>' : '';   /* 필싸 = 몽땅이 스티커(2026-11-14 s1114tp2) */
     const sub = multi ? dayMarks(items.slice(1)) : "";
     const lab = dayLabel(k, items) + (td ? " 오늘." : "");
     let cls, body;
@@ -2266,11 +2312,11 @@ function renderSched(dir){
       const cs = main.kind === "cs", mt = main.kind === "mt";
       cls = " has d-" + ds + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
       body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
-        + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true" style="--gd:-'+((d * 1.37) % 4.6).toFixed(2)+'s"><i class="pdgl"></i><i class="pdgl g2"></i></i>' : '');   /* 유료 광택 · 금가루 반짝임은 모양 안에서만(2026-11-14 금빛 크레용) */
+        + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true" style="--gd:-'+((d * 1.37) % 10).toFixed(2)+'s"><i class="pdgl"></i><i class="pdgl g2"></i></i>' : '');   /* 유료 광택 · 금가루 반짝임은 모양 안에서만(2026-11-14 금빛 크레용) */
     }
     h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
        + (inCap && psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
-       + ' data-d="'+k+'" aria-pressed="'+(pk ? "true" : "false")+'"'+cur+' aria-label="'+esc(lab)+'">' + body + sub + '<i class="cal-pk" aria-hidden="true"></i>' + tdTag + '</button>';
+       + ' data-d="'+k+'" aria-pressed="'+(pk ? "true" : "false")+'"'+cur+' aria-label="'+esc(lab)+'">' + body + mtg + sub + '<i class="cal-pk" aria-hidden="true"></i>' + tdTag + '</button>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
