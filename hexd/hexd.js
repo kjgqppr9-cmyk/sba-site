@@ -1686,6 +1686,7 @@ function hexdEnhanceReviews(){
     let code=m[1], rest=txt.slice(m[0].length), nick='';
     const hit=nicks.find(n=>rest.indexOf(n.nick)===0);
     if(hit){ nick=hit.nick; rest=rest.slice(nick.length); }
+    if(!nick && TYPE_30[code]) nick=TYPE_30[code].nickname;   /* 2026-11-16: 글에 유형 이름이 빠진 후기도 공식 이름을 붙인다 */
     rest=rest.replace(/^[\s·:|,\-]+/,'').trim();
     const chip=document.createElement('div'); chip.className='hx-rv-type';
     const b=document.createElement('b'); b.textContent=code==='MASTER'?'M':code==='BALANCED'?'B':code; chip.appendChild(b);
