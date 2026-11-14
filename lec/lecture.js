@@ -1321,7 +1321,7 @@ const LECTURES = [
      장소 · 내용 · 신청 없음. 강의 목록 · 다음 개강 · 히어로 전환 · 상세 창에는 나오지 않는다.
      kind:"personal" = 개인 일정(코랄) · kind:"feelssa" = 필싸 일정(머스터드 노랑, 2026-11-14 대표님)
      쓰는 법: {id, kind:"personal"|"feelssa", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
-  {id:"personal-1106", kind:"personal", from:"2026-11-06"},
+  {id:"feelssa-1106", kind:"feelssa", from:"2026-11-06"},   /* 11/15 대표님: 개인 → 필싸 */
   {id:"personal-1113", kind:"personal", from:"2026-11-13"},
   {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"},
   {id:"feelssa-1123", kind:"feelssa", from:"2026-11-23"},
