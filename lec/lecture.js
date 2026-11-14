@@ -1256,6 +1256,7 @@ const LECTURES = [
   {id:"personal-1106", kind:"personal", from:"2026-11-06"},
   {id:"personal-1113", kind:"personal", from:"2026-11-13"},
   {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"},
+  {id:"personal-1123", kind:"personal", from:"2026-11-23"},
   {id:"personal-1222", kind:"personal", from:"2026-12-22"}
 ];
 
