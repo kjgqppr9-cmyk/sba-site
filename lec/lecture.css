@@ -784,3 +784,19 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 /* 2026-11-15 s1115tp2 대표님 B-1 유지 + 기호 하나 받침을 조금 위로 — 이중 테두리 틈(--dg) 안쪽, 초록 채움 위에 앉게 */
 .slp .cd.has .cal-marks.solo{bottom:calc(var(--dg) + 3px)}
 @container (max-width:600px){.slp .cd.has .cal-marks.solo{bottom:calc(var(--dg) + 1px)}.slp .cd.has:has(.cal-marks.solo){padding-bottom:4px}}   /* 휴대폰 44px 칸: 점을 1px 만 올리고 숫자를 2px 위로 — 숫자와 점 사이 1.5px 남김(s1115tp2 실측) */
+/* ══ 컨설팅 = 노란 이중원 시험판(2026-11-15 s1115tp4 대표님 — 별이 통일감이 없어 개인 일정 원처럼). 되돌리려면 이 묶음만 지우면 별로 돌아간다.
+   초청(연노랑 #F7E19A 네모)과 헷갈리지 않게 한 단계 진한 노랑 #F2C94C 채움 + 진초록 숫자, 지난 컨설팅은 빛바랜 노랑. ══ */
+.slp{--csf:#F2C94C;--csl:#E0B12E;--cst:#FCF1CC}
+.slp .cd.has.cs{border-radius:50%}
+.slp .cd.cs .cst{display:none}
+.slp .cd.has.cs.d-fut{background:var(--csf);color:#1E3932;box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 var(--dg) var(--cst)}
+.slp .cd.has.cs.d-done{background:var(--ivd);color:#5E6B5C;box-shadow:inset 0 0 0 1px var(--ivde),inset 0 0 0 var(--dg) #fff}
+.slp .calfoot em.cs{border-radius:50%;width:16px;height:16px;background:var(--csf);box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 3px var(--cst)}
+.slp .calfoot em.cs svg{display:none}
+.slp .mlist .nm .cstar{-webkit-mask:none;mask:none;border-radius:50%;width:12px;height:12px;vertical-align:-1px;background:var(--csf);box-shadow:inset 0 0 0 1px var(--csl)}
+.slp .cd .cal-mark.m-cs{border-radius:50%;flex-basis:8px;width:8px;height:8px;background:var(--csf)}
+.slp .cd .cal-mark.m-cs svg{display:none}
+.slp .cd .cal-mark.m-cs.d-done{background:var(--ivde)}
+.slp .cd .cal-main.m-cs{border-radius:50%;background:var(--csf)}
+.slp .cd .cal-main.m-cs svg{display:none}
+.slp .cd .cal-main.m-cs.d-done{background:var(--ivd);box-shadow:inset 0 0 0 1px var(--ivde)}
