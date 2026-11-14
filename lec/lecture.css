@@ -427,12 +427,11 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist ul{list-style:none;display:grid;gap:8px}
 .slp .mlist li{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:baseline;
   background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;
-  cursor:pointer;transition:border-color .2s,transform .22s var(--pop),box-shadow .22s,opacity .25s}
-.slp .mlist li:hover{border-color:#9FC7B5;transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.06)}
-.slp .mlist li:active{transform:translateY(0) scale(.995)}
+  cursor:pointer;position:relative;transition:border-color .18s ease,box-shadow .18s ease,opacity .18s ease}
+.slp .mlist li:hover{border-color:#9FC7B5;box-shadow:0 2px 8px rgba(0,0,0,.04)}
 .slp .mlist li:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.slp .mlist li.dim{opacity:.34}
-.slp .mlist li.lit{border-color:var(--house);box-shadow:0 6px 16px rgba(0,0,0,.09)}
+.slp .mlist li.dim{opacity:.48}
+.slp .mlist li.lit{z-index:1;border-color:var(--house);box-shadow:0 2px 8px rgba(0,0,0,.04)}
 .slp .mlist .dd{font-size:14.5px;font-weight:800;color:var(--house);white-space:nowrap}
 .slp .mlist .dd em{font-style:normal;color:var(--ink2);font-size:13px;margin-left:2px}
 .slp .mlist .bd{min-width:0}
@@ -583,7 +582,6 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   .slp .oc-prep li:hover{transform:none}
   .slp .cards{grid-template-columns:1fr}
   .slp .lc:hover{transform:none}
-  .slp .mlist li:hover{transform:none}
   .slp .ov{padding:0}
   .slp .ov-box{border-radius:18px 18px 0 0;min-height:100%}
   .slp .ov-hd{padding:22px 20px 16px;border-radius:18px 18px 0 0}

@@ -1922,8 +1922,9 @@ function applyPick(move){
   if(move) pickToTop(host);
 }
 /* 날짜를 누르면 그 날 일정이 목록 맨 위로 올라온다(다른 일정은 흐리게 그 아래에 남는다 — 그 달 흐름을 잃지 않게).
-   다시 누르면 날짜 순서로 돌아간다. FLIP: 옮기기 전 위치 → 옮긴 뒤 위치를 transform 으로 메워 '띠용' 하고 제자리.
-   (2026-11-14 대표님) */
+   다시 누르면 날짜 순서로 돌아간다. FLIP: 옮기기 전 위치 → 옮긴 뒤 위치를 transform 으로 메워 제자리로 미끄러진다.
+   튕김 · 확대 · 빛 없이, 모든 항목이 같은 곡선 · 같은 시간으로 동시에 움직인다(시간은 가장 멀리 가는 거리로 정함).
+   (2026-11-14 대표님 — 처음엔 '띠용' 튕김이었으나 부자연스럽다 하셔서 GPT 솔 검토안으로 바꿈) */
 function pickToTop(host){
   const ul = host.querySelector("#calList ul"); if(!ul) return;
   const lis = Array.prototype.slice.call(ul.children);
@@ -1931,7 +1932,8 @@ function pickToTop(host){
   const want = lis.slice().sort((a,b) => (top(b) - top(a)) || (+a.getAttribute("data-i") - +b.getAttribute("data-i")));
   const still = reduced() || !ul.animate;
   const before = new Map(lis.map(li => [li, li.getBoundingClientRect().top]));
-  if(!still) lis.forEach(li => li.getAnimations && li.getAnimations().forEach(a => a.cancel()));   /* 빨리 연달아 눌러도 지금 보이는 자리에서 이어서 */
+  /* 빨리 연달아 눌러도 지금 보이는 자리에서 이어서. 목록 이동(FLIP)만 취소한다 — getAnimations 에는 CSS 전환(흐림 등)도 들어 있다 */
+  if(!still) lis.forEach(li => li.getAnimations && li.getAnimations().forEach(a => { if(a.id === "cal-list-flip") a.cancel(); }));
   want.forEach(li => ul.appendChild(li));
   /* 스크롤은 옮긴 직후(움직임을 걸기 전) 위치로 잰다 — 움직이는 중에 재면 transform 만큼 틀린다 */
   if(calPick){
@@ -1947,23 +1949,13 @@ function pickToTop(host){
     }
   }
   if(!still){
-    const BOING = "cubic-bezier(.34,1.56,.64,1)";
-    want.forEach(function(li){
-      const dy = before.get(li) - li.getBoundingClientRect().top;
-      if(top(li)){
-        li.animate([
-          {transform:"translateY("+dy+"px)", easing:BOING},
-          {transform:"translateY(0) scale(1.035)", offset:.72, easing:"ease-in-out"},
-          {transform:"none"}
-        ], {duration:Math.abs(dy) > 1 ? 680 : 420});
-        li.animate([
-          {boxShadow:"0 0 0 0 rgba(0,98,65,0)"},
-          {boxShadow:"0 0 0 4px rgba(0,98,65,.22), 0 8px 20px rgba(0,0,0,.12)", offset:.6},
-          {boxShadow:"0 6px 16px rgba(0,0,0,.09)"}
-        ], {duration:900, easing:"ease-in-out"});
-      } else if(Math.abs(dy) > .5){
-        li.animate([{transform:"translateY("+dy+"px)"},{transform:"none"}], {duration:560, easing:BOING});
-      }
+    const EASE = "cubic-bezier(.3,0,0,1)";   /* 양끝 속도 0, 넘침 없음 */
+    const moves = want.map(li => ({li, dy: before.get(li) - li.getBoundingClientRect().top}));
+    const dist = moves.reduce((m, v) => Math.max(m, Math.abs(v.dy)), 0);
+    const duration = Math.min(460, Math.max(240, 220 + .3 * dist));
+    moves.forEach(function(v){
+      if(Math.abs(v.dy) <= .5) return;
+      v.li.animate([{transform:"translateY("+v.dy+"px)"},{transform:"none"}], {id:"cal-list-flip", duration:duration, easing:EASE});
     });
   }
 }
