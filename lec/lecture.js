@@ -2307,8 +2307,9 @@ function renderSched(dir){
     const td = (k === ymd(TODAY)) ? " today" : "";
     const pk = (k === calPick) ? " pick" : "";
     const cur = td ? ' aria-current="date"' : '';
-    const tdTag = td ? '<i class="cal-td" aria-hidden="true">오늘</i>' : '';   /* 오늘 = 왼쪽 위 「오늘」 딱지(2026-11-14 s1114tp1) */
-    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1"'+cur+'>'+d+tdTag+'</button>'; continue; }
+    const tdTag = '';   /* 오늘 딱지 없앰(2026-11-15 s1115td1 대표님 B2) — 오늘은 숫자(.tdn)가 1px 크게 + 흰 빛으로 콩닥콩닥 */
+    const dn = td ? '<span class="tdn">'+d+'</span>' : d;
+    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1"'+cur+'>'+dn+tdTag+'</button>'; continue; }
     /* 모양 = 종류, 채움 = 속성(2026-11-14 대표님 확정, GPT 솔 검토안): 강의 네모 · 컨설팅 별 · 멘토링 원 · 개인 · 필싸 코랄 · 겨자 원.
        일반 강의 진초록 채움, 초청 흰 바탕 + 진초록 2px 테두리, 유료 금색 채움(금색은 유료에만). 지난 날(회차 날짜 기준)은 민트.
        오늘 = 왼쪽 위 「오늘」 딱지(.cal-td), 고른 날 = 오른쪽 아래 체크(.cal-pk, s1114tp1). 개인 · 필싸는 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
@@ -2323,12 +2324,12 @@ function renderSched(dir){
     if(inCap){
       cls = " ps" + PKIND[c].cls + (psSeg[k] === 1 ? " one" : psSeg[k] > 1 ? " cap" : "") + (psEnd[k] ? " capend" : "")
           + (main.ps ? "" : " pmx d-" + ds + (L.paid ? " pdm" : "") + (L.kind === "invite" ? " ivm" : ""));
-      body = main.ps ? d : '<i class="cal-main m-'+main.kind+' d-'+ds+(L.kind === "invite" ? " iv" : "")+(L.paid ? " pd" : "")+'" aria-hidden="true">'
-          + (main.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>' + d;
+      body = main.ps ? dn : '<i class="cal-main m-'+main.kind+' d-'+ds+(L.kind === "invite" ? " iv" : "")+(L.paid ? " pd" : "")+'" aria-hidden="true">'
+          + (main.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>' + dn;
     } else {
       const cs = main.kind === "cs", mt = main.kind === "mt";
       cls = " has d-" + ds + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
-      body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
+      body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+dn+'</span>' : dn)
         + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true" style="--gd:-'+((d * 1.37) % 10).toFixed(2)+'s"><i class="pdgl"></i><i class="pdgl g2"></i></i>' : '');   /* 유료 광택 · 금가루 반짝임은 모양 안에서만(2026-11-14 금빛 크레용) */
     }
     h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
@@ -2338,6 +2339,7 @@ function renderSched(dir){
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
   grid.innerHTML = h;
+  { const lg = (hostEl() || document).querySelector(".calfoot em.td"); if(lg) lg.textContent = String(TODAY.getDate()); }   /* 범례 견본 = 오늘 날짜 숫자(s1115td1) */
   psFit(grid);
   /* 달 넘김(go-l · go-r) · 나타남(.rv) 같은 움직임이 끝나면 자리가 바뀌므로 딱지 · 체크를 다시 맞춘다 */
   if(!grid.__snapEv){
