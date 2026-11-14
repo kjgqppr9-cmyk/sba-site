@@ -323,15 +323,32 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.has.d-done{background:var(--mint);color:#1F5140;box-shadow:inset 0 0 0 1px #5E8B78}
 .slp .cd.has.iv.d-fut{background:#fff;color:var(--green);box-shadow:inset 0 0 0 2px var(--green)}
 .slp .cd.has.iv.d-done{background:#fff;color:#1F5140;box-shadow:inset 0 0 0 2px #5E8B78}
-.slp .cd.has.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258);color:#0B3D2A;text-shadow:none}
-/* 유료 광택 — 모양 안(.pdshn, overflow:hidden)에서 낮은 세기로 한 번씩 지나간다 */
-.slp .pdshn{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
+/* ══ 유료 = 금빛 크레용 (2026-11-14 대표님 — HUSS 특강 덱 assets/fx/gold_crayon.* 를 칸 크기로 줄임) ══
+   질감 그림 --gcr 은 lecture.js goldTex 가 칸 크기에 맞춰 한 번 굽는다(크레용 결 · 종이결 · 금 입자). 못 구우면 --gold-f 그라데이션.
+   숫자 #0B3D2A + 아주 엷은 크림 테(text-shadow)로 결 위에서도 대비 5:1 이상. 반짝임 = 칸 안 금가루 별 두 개(.pdgl)가
+   가끔 켜졌다 꺼지고 엷은 광택이 한 번 지나간다 — transform · opacity 만 움직여 칸이 여러 개여도 가볍다. 움직임 줄이기면 정지. */
+.slp{--gold-f:linear-gradient(145deg,#F0D58C,#D8A945)}
+.slp .cd.has.pd.d-fut{background:var(--gcr,var(--gold-f)) center/cover no-repeat;color:#0B3D2A;
+  text-shadow:0 0 2px rgba(255,248,226,.9);box-shadow:inset 0 0 0 1px rgba(138,101,18,.22);isolation:isolate}
+/* 광택 · 별은 칸 바탕 위 · 숫자 아래(z-index:-1 + 칸 isolation) — 빛이 숫자를 덮어 대비를 떨어뜨리지 않게 */
+.slp .pdshn{position:absolute;inset:0;z-index:-1;border-radius:inherit;overflow:hidden;pointer-events:none;font-style:normal}
 .slp .pdshn::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:45%;
-  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.42) 50%,transparent 100%);
-  transform:translateX(-160%) skewX(-18deg);animation:pdShine 3.4s cubic-bezier(.4,0,.2,1) infinite}
-@keyframes pdShine{0%,55%{transform:translateX(-160%) skewX(-18deg)}85%,100%{transform:translateX(330%) skewX(-18deg)}}
-.slp .cd.has.pd.d-fut:hover .pdshn::before{animation-duration:1.4s}
-@media (prefers-reduced-motion:reduce){.slp .pdshn::before{animation:none!important}}
+  background:linear-gradient(100deg,transparent 0%,rgba(255,249,228,.34) 50%,transparent 100%);
+  transform:translateX(-160%) skewX(-18deg);animation:pdShine 5.2s cubic-bezier(.4,0,.2,1) infinite;animation-delay:var(--gd,0s)}
+@keyframes pdShine{0%,62%{transform:translateX(-160%) skewX(-18deg)}88%,100%{transform:translateX(330%) skewX(-18deg)}}
+.slp .cd.has.pd.d-fut:hover .pdshn::before{animation-duration:1.6s}
+/* 금가루 별 — 덱 .sba-gold-glint(크림 종이 위 금빛 테 판)을 칸 크기로. 숫자를 덮지 않게 오른쪽 위 · 왼쪽 아래 귀퉁이에만 */
+.slp .pdshn .pdgl{position:absolute;left:78%;top:21%;width:30%;height:30%;margin:-15% 0 0 -15%;border-radius:50%;opacity:0;font-style:normal;
+  background:radial-gradient(circle closest-side,#fff 0,#fff 12%,rgba(255,242,196,.92) 24%,rgba(196,134,22,.32) 46%,rgba(196,134,22,0) 72%);
+  animation:pdGlint 4.6s ease-out infinite;animation-delay:var(--gd,0s)}
+.slp .pdshn .pdgl::before,.slp .pdshn .pdgl::after{content:"";position:absolute;left:50%;top:50%;width:170%;height:1px;
+  background:linear-gradient(90deg,rgba(180,120,18,0),rgba(180,120,18,.5) 26%,#fff 50%,rgba(180,120,18,.5) 74%,rgba(180,120,18,0));
+  transform:translate(-50%,-50%)}
+.slp .pdshn .pdgl::after{transform:translate(-50%,-50%) rotate(90deg)}
+.slp .pdshn .pdgl.g2{left:23%;top:78%;width:22%;height:22%;margin:-11% 0 0 -11%;animation-delay:calc(var(--gd,0s) - 2.4s)}
+@keyframes pdGlint{0%,68%,100%{opacity:0;transform:scale(.2) rotate(0deg)}75%{opacity:.88;transform:scale(1) rotate(18deg)}
+  84%{opacity:.4;transform:scale(.62) rotate(30deg)}92%{opacity:0;transform:scale(.2) rotate(42deg)}}
+@media (prefers-reduced-motion:reduce){.slp .pdshn::before{animation:none!important}.slp .pdshn .pdgl{display:none}}
 /* ══ 컨설팅 칸 (2026-09-28 대표님): 네모는 강의, 별은 컨설팅.
    색은 다른 칸과 같은 규칙(앞으로 = 진초록, 지난 것 = 민트)이고 모양만 별이다. 금선은 없앴다(2026-11-14, 금색은 유료에만).
    가운데 맞춤: 숫자는 옆 칸 숫자와 같은 자리(칸 가운데)에 그대로 두고, 별의 몸통 중심을 숫자 글자 한가운데에 맞춘다.
@@ -377,7 +394,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   position:relative;flex:none}
 .slp .calfoot em.lg{background:var(--green)}
 .slp .calfoot em.lg.iv{background:#fff;box-shadow:inset 0 0 0 2px var(--green)}
-.slp .calfoot em.lg.pd{background:linear-gradient(145deg,#E8C97E,#CBA258)}
+.slp .calfoot em.lg.pd{background:var(--gcr,var(--gold-f)) center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(138,101,18,.25)}
 .slp .calfoot em.lg.dn{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
 .slp .calfoot em.td{width:auto;height:auto;border-radius:0;background:none;padding:0 2px;font-size:12.5px;font-weight:800;line-height:1.2;color:var(--house);
   text-decoration:underline 2px currentColor;text-underline-offset:2px;text-decoration-skip-ink:none}
@@ -399,7 +416,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist .bd{min-width:0}
 .slp .mlist .nm{display:block;font-size:15px;font-weight:800;color:var(--house);line-height:1.4}
 .slp .mlist .nm i{font-style:normal;color:var(--gold);font-size:13px;margin-left:6px}
-.slp .mlist .nm .ptag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;vertical-align:1px;font-size:12px;font-weight:800;line-height:1.5;color:#0B3D2A;background:linear-gradient(145deg,#E8C97E,#CBA258)}
+.slp .mlist .nm .ptag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;vertical-align:1px;font-size:12px;font-weight:800;line-height:1.5;color:#0B3D2A;background:var(--gcr,var(--gold-f)) center/cover no-repeat;text-shadow:0 0 2px rgba(255,248,226,.9);box-shadow:inset 0 0 0 1px rgba(138,101,18,.22)}
 .slp .mlist .tt{display:block;margin-top:3px;font-size:14px;color:var(--ink2);line-height:1.5}
 .slp .mlist .none{font-size:14.5px;color:var(--ink2);background:#fff;border:1.5px dashed var(--line);
   border-radius:12px;padding:18px;text-align:center}
@@ -666,7 +683,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-mark.d-done{background:#5E8B78}
 .slp .cd .cal-mark.iv{background:#fff;border:2px solid var(--green);border-radius:1px}
 .slp .cd .cal-mark.iv.d-done{background:#fff;border-color:#5E8B78}
-.slp .cd .cal-mark.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258);box-shadow:inset 0 0 0 1px #8A6512}
+.slp .cd .cal-mark.pd.d-fut{background:linear-gradient(145deg,#F0D58C,#D8A945);box-shadow:inset 0 0 0 1px #8A6512}   /* 8px 는 질감 대신 같은 색감만 */
 .slp .cd .cal-mark.m-mt,.slp .cd .cal-mark.m-ps,.slp .cd .cal-mark.m-fs{border-radius:50%}
 .slp .cd .cal-mark.m-ps{background:#D97757}
 .slp .cd .cal-mark.m-fs{background:#AD7F0A}
@@ -675,9 +692,18 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-mark svg path{fill:var(--green);stroke:none}
 .slp .cd .cal-mark.m-cs.d-done svg path{fill:#5E8B78}
 .slp .cd .cal-more{font-style:normal;font-size:9px;font-weight:800;color:var(--house);letter-spacing:-.02em;line-height:1}
-/* 기호가 하나뿐인 날 — 흰 알약이 기호를 감싸 'O'(고리)처럼 읽히지 않게 납작한 직사각 받침으로(a3 4번) */
-.slp .cd .cal-marks.solo{min-width:22px;height:12px;padding:2px 7px;border-radius:3px;background:#fff;box-shadow:none}
-.slp .cd .cal-marks.solo .m-mt{width:8px;height:8px;flex:0 0 8px;border:0;border-radius:50%}
+/* 기호가 하나뿐인 날 — 받침은 동그라미(2026-11-14 대표님). 예전 흰 알약이 'O' 글자처럼 보였던 건 테두리가 굵고 점이 작아서다:
+   받침 12px 원 + 점 8px(흰 테 2px — 둘 다 짝수라 중심이 정확히 맞는다), 아주 옅은 윤곽선 + 그림자로 '받침 원'임을 보인다.
+   컨설팅 별은 10px(받침과 1px 씩 여유). 다른 종류 하나일 때도 같은 원 받침. */
+.slp .cd .cal-marks.solo{width:12px;min-width:12px;height:12px;padding:0;gap:0;border-radius:50%;
+  background:radial-gradient(circle at 50% 35%,#fff 0,#fff 55%,#E9EFEC 100%);
+  box-shadow:0 0 0 .5px rgba(30,57,50,.22),0 1px 2px rgba(0,0,0,.28)}
+.slp .cd .cal-marks.solo .cal-mark{flex:0 0 8px;width:8px;height:8px}
+.slp .cd .cal-marks.solo .m-mt{border:0;border-radius:50%}
+/* 초록 칸 위 초록 점은 '구멍'처럼 보여 받침이 'O' 로 읽힌다 → 점에 윗빛을 줘 구슬처럼(같은 초록 계열) */
+.slp .cd .cal-marks.solo .m-mt.d-fut,.slp .cd .cal-marks.solo .m-lec.d-fut:not(.iv):not(.pd){
+  background:radial-gradient(circle at 35% 30%,#5DBB94 0,#108a5c 42%,#00573A 100%)}
+.slp .cd .cal-marks.solo .m-cs{flex-basis:10px;width:10px;height:10px}
 /* 캡슐 안 대표 강의(.pmx) — 같은 속성 규칙을 원판 크기(--psc) 모양에 */
 .slp .cd.ps.pmx::before{display:none}
 .slp .cd.ps.pmx.d-done{color:#1F5140}
@@ -688,7 +714,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-main.d-done{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
 .slp .cd .cal-main.iv.d-fut{background:#fff;box-shadow:inset 0 0 0 2px var(--green)}
 .slp .cd .cal-main.iv.d-done{background:#fff;box-shadow:inset 0 0 0 2px #5E8B78}
-.slp .cd .cal-main.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258)}
+.slp .cd .cal-main.pd.d-fut{background:var(--gcr,var(--gold-f)) center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(138,101,18,.22)}
 .slp .cd .cal-main.m-mt{border-radius:50%}
 .slp .cd .cal-main.m-cs{background:none;border-radius:0;box-shadow:none}
 .slp .cd .cal-main svg{display:block;width:100%;height:100%;max-width:none;max-height:none;overflow:visible}
@@ -698,7 +724,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calfoot .mxnote{flex-basis:100%;color:var(--ink2);font-size:12px}
 @container (max-width:600px){
   .slp .cd .cal-marks{bottom:3px;height:11px;gap:2px;padding:0 2px}
-  .slp .cd .cal-marks.solo{height:12px;padding:2px 6px;min-width:20px}
+  .slp .cd .cal-marks.solo{width:12px;min-width:12px;height:12px;padding:0}
 }
 
 /* ══ 날짜 고를 때 안무 (2026-11-14 대표님: '밋밋하다 · 화려하되 고급스럽게') — 움직임 값은 lecture.js pickToTop 주석.

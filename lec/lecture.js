@@ -1062,6 +1062,44 @@ const LECTURES = [
 `
   },
   {
+    /* 2026-11-14 대표님: 11/28(토) 3기. 시간 · 장소 · 수강료 · 정원 · 커리큘럼 · 모집 기간은 아직 안 정해짐 → '추후 안내'.
+       모집 기간이 정해지면 apply:{from,to} 를 넣고 status 를 "auto" 로 바꾼다(apply 없이 auto 면 '모집완료'로 뜬다).
+       신청 폼 PROGRAMS 에는 아직 넣지 않았다. */
+    id:"cc-3", title:"클로드 코드 마스터클래스", edition:"3기", status:"upcoming", paid:true,
+    host:"스몰브랜드설계자 · 프라이빗 유료 과정",
+    summary:"디자이너 · 마케터 · 개발자의 일을 함께할 AI 를, 내 브랜드를 이해하도록 내 컴퓨터 안에 세팅하는 과정입니다. "
+        + "시간 · 장소 · 수강료 · 모집 기간은 추후 안내합니다.",
+    info:{
+      when:"11월 28일(토)",
+      time:"추후 안내",
+      place:"추후 안내"
+    },
+    sessions:[
+      {date:"2026-11-28", n:1, title:"시간 · 장소 추후 안내"}
+    ],
+    time:"시간 추후 안내",
+    hours:null, capacity:null, enrolled:0,
+    rating:null, ratingCount:0,
+    reviews:[],
+    detail:`
+## 대표를 위한 클로드 코드 마스터클래스
+챗GPT 창에 묻고 답하는 단계에서 한 발 더 나갑니다. **클로드 코드**는 내 컴퓨터 안에서 내 파일과 프로그램을 직접 다루는 AI 입니다.
+이 과정의 목표는 하나입니다. 강의가 끝날 때 **내 브랜드를 이해하고, 내 방식대로 일하는 AI** 가 내 노트북 안에 세팅되어 있는 것.
+
+## 한눈에
+| | |
+| --- | --- |
+| **일시** | 11월 28일(토) · 시간 추후 안내 |
+| **장소** | 추후 안내 |
+| **수강료** | 추후 안내 |
+| **모집 기간** | 추후 안내 |
+
+## 3기 안내
+세부 일정과 커리큘럼은 정해지는 대로 이 자리에 올립니다.
+모집이 시작될 때 알림을 받으시려면 페이지 아래 신청 폼에서 **알림**을 신청해 주세요.
+`
+  },
+  {
     id:"omni-2", title:"옴니채널 브랜딩 빌드업", edition:"2차", status:"auto",
     host:"상지대학교 창업보육센터",
     summary:"브랜드 메시지를 정리하고, AI로 카피 · 이미지 · 숏폼을 직접 만들어 흩어진 채널을 하나의 운영 체계로 묶습니다. 1차와 같은 커리큘럼으로 다시 엽니다.",
@@ -2073,6 +2111,89 @@ function psFit(grid){
   grid.style.setProperty("--psc", d + "px");
   grid.style.setProperty("--psr", r + "px");
   grid.style.setProperty("--pstep", ((grid.getBoundingClientRect().width + gap) / 7) + "px");
+  goldFit(w);
+}
+/* ── 유료 = 금빛 크레용 (2026-11-14 대표님 — HUSS 특강 덱 assets/fx/gold_crayon.js 의 질감을 달력 칸 크기로 줄인 것) ──
+   덱은 밑줄 획 하나하나를 픽셀로 구웠다. 여기서는 칸 크기(소수 px 반올림 × 화면 배율, 최대 2배) 네모 하나만 한 번 굽고
+   --gcr(url) 로 모든 유료 칸 · 캡슐 안 유료 모양 · 목록 '유료' 글자 · 범례가 같이 쓴다. 반복 루프 · 필터 없음.
+   질감 = 오른쪽 위로 비스듬한 크레용 결(누르는 힘 띠) + 종이결(결 골에 크레용이 덜 묻어 옅은 금 바탕이 비침) + 금 입자(밝은 금 · 하얀 반사 · 옅은 어두운 점).
+   ⚠ 숫자 #0B3D2A 대비 5:1 이상: 색 띠를 밝은 쪽(.58 이상)만 쓰고, 어두운 입자도 .55 아래로 내리지 않는다. 비친 바탕(GOLD_PAPER)은 더 밝다. */
+const GOLD_RAMP = (function(st){
+  const lut = new Uint8Array(256 * 3);
+  for(let i = 0; i < 256; i++){
+    const t = i / 255; let k = 1;
+    while(k < st.length - 1 && st[k][0] < t) k++;
+    const a = st[k-1], b = st[k], f = (t - a[0]) / (b[0] - a[0]);
+    for(let c = 0; c < 3; c++) lut[i*3+c] = Math.round(a[1][c] + (b[1][c] - a[1][c]) * f);
+  }
+  return lut;
+})([[0,[96,60,8]],[.16,[138,90,18]],[.32,[171,118,24]],[.47,[199,148,36]],[.60,[219,172,58]],
+    [.72,[234,195,96]],[.83,[246,221,148]],[.92,[251,238,196]],[1,[255,253,240]]]);   /* 덱 RAMP_LIGHT 그대로 */
+const GOLD_PAPER = [246,229,180];
+function gHash(x, y, s){
+  let n = Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(s, 1442695041) | 0;
+  n = Math.imul(n ^ n >>> 13, 1274126177);
+  return ((n ^ n >>> 16) >>> 0) / 4294967296;
+}
+function gNoise(x, y, s){
+  const ix = Math.floor(x), iy = Math.floor(y); let fx = x - ix, fy = y - iy;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+  const a = gHash(ix, iy, s), b = gHash(ix + 1, iy, s), c = gHash(ix, iy + 1, s), d = gHash(ix + 1, iy + 1, s);
+  return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+}
+function gSm(v){ return v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v); }
+const goldCache = {};
+function goldTex(Wc, S){
+  const key = Wc + "_" + S;
+  if(goldCache[key] !== undefined) return goldCache[key];
+  let url = "";
+  try{
+    const n = Math.round(Wc * S), cv = document.createElement("canvas");
+    cv.width = cv.height = n;
+    const ctx = cv.getContext("2d"), img = ctx.createImageData(n, n), px = img.data, sd = 0x5BA1;
+    const s1 = sd ^ 0x51ED, s2 = sd ^ 0x1B56, s3 = sd ^ 0x7F4A, s4 = sd ^ 0x2C1B, s5 = sd ^ 0x3A91, s6 = sd ^ 0x6E07, s7 = sd ^ 0x4D33, s8 = sd ^ 0x0B6F;
+    const co = Math.cos(.61), si = Math.sin(.61), cA = 1.2, cB = 2.2;
+    for(let y = 0; y < n; y++){
+      const Y = y / S;
+      for(let x = 0; x < n; x++){
+        const X = x / S, a = X * co - Y * si, b = X * si + Y * co;   /* a = 결을 따라(오른쪽 위로), b = 결을 가로질러 */
+        const P = .84 + .28 * (gNoise(b * .32, a * .035, s1) - .5);   /* 한 번 한 번 그은 띠마다 누르는 힘이 다르다 */
+        const g = .40 * gNoise(X * .92, Y * .92, s6) + .18 * gNoise(X * 2.3, Y * 2.3, s7) + .42 * gNoise(a * .06, b * 1.4, s8);
+        const cov = Math.max(gSm((P - g * 1.2 + .08) / .16), .35);   /* 종이 골에는 덜 묻는다 — 엷은 왁스 막은 남는다 */
+        let tone = .70 + .10 * (1 - (X + Y) / Wc) + .12 * (gNoise(a * .03, b * .25, s2) - .5) + .18 * (gNoise(b * .45, a * .04, s3) - .5) + (.5 - g) * .26;
+        let lo = .58;
+        let ci = Math.floor(X / cA), cj = Math.floor(Y / cA), fr = gHash(ci, cj, s2);
+        if(fr < .16 || fr > .88){
+          const dx = X / cA - ci - (.25 + .5 * gHash(ci, cj, s3)), dy = Y / cA - cj - (.25 + .5 * gHash(ci, cj, s4)), r = .22 + .28 * gHash(ci, cj, s5);
+          if(dx * dx + dy * dy < r * r){
+            if(fr < .015) tone = 1; else if(fr < .06) tone += .30; else if(fr < .16) tone += .14; else { tone -= .12; lo = .55; }
+          }
+        }
+        ci = Math.floor(X / cB); cj = Math.floor(Y / cB); fr = gHash(ci, cj, s6);
+        if(fr < .06){
+          const cx = (ci + .3 + .4 * gHash(ci, cj, s7)) * cB, cy = (cj + .3 + .4 * gHash(ci, cj, s8)) * cB, r = (.20 + .22 * gHash(ci, cj, s1)) * cB;
+          if((X - cx) * (X - cx) + (Y - cy) * (Y - cy) < r * r) tone = fr < .025 ? 1 : tone + .26;
+        }
+        tone = tone < lo ? lo : tone > 1 ? 1 : tone;
+        const ti = (tone * 255 | 0) * 3, o = (y * n + x) * 4;
+        px[o]   = GOLD_PAPER[0] + (GOLD_RAMP[ti]   - GOLD_PAPER[0]) * cov;
+        px[o+1] = GOLD_PAPER[1] + (GOLD_RAMP[ti+1] - GOLD_PAPER[1]) * cov;
+        px[o+2] = GOLD_PAPER[2] + (GOLD_RAMP[ti+2] - GOLD_PAPER[2]) * cov;
+        px[o+3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    url = cv.toDataURL("image/png");
+  }catch(e){ url = ""; }
+  return (goldCache[key] = url);
+}
+function goldFit(w){
+  const h = hostEl(), Wc = Math.max(16, Math.round(w)), S = Math.min(2, Math.max(1, Math.ceil(window.devicePixelRatio || 1)));
+  if(!h || h.__gold === Wc + "_" + S) return;
+  const url = goldTex(Wc, S);
+  if(!url) return;   /* 못 구우면 CSS 의 금색 그라데이션이 그대로 남는다 */
+  h.__gold = Wc + "_" + S;
+  h.style.setProperty("--gcr", 'url("' + url + '")');
 }
 function renderSched(dir){
   if(!MONTHS.length) return;
@@ -2144,7 +2265,7 @@ function renderSched(dir){
       const cs = main.kind === "cs", mt = main.kind === "mt";
       cls = " has d-" + ds + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
       body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
-        + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true"></i>' : '');   /* 유료 광택은 모양 안에서만(왕관 · 입자 · 바깥 빛 없앰) */
+        + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true" style="--gd:-'+((d * 1.37) % 4.6).toFixed(2)+'s"><i class="pdgl"></i><i class="pdgl g2"></i></i>' : '');   /* 유료 광택 · 금가루 반짝임은 모양 안에서만(2026-11-14 금빛 크레용) */
     }
     h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
        + (inCap && psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
