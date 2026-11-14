@@ -2111,6 +2111,9 @@ function psFit(grid){
   grid.style.setProperty("--psc", d + "px");
   grid.style.setProperty("--psr", r + "px");
   grid.style.setProperty("--pstep", ((grid.getBoundingClientRect().width + gap) / 7) + "px");
+  /* 둥근값 한 체계(2026-11-14 s1114tp4): 둥근 네모는 모두 '한 변 × 0.3'. 칸 = 칸 폭 × 0.3, 캡슐 안 대표 모양 = 원판 지름 × 0.3 (CSS 는 --cr · --crm) */
+  grid.style.setProperty("--cr", (Math.round(w * .3 * 2) / 2) + "px");
+  grid.style.setProperty("--crm", (Math.round(d * .3 * 2) / 2) + "px");
   goldFit(w);
 }
 /* ── 유료 = 금빛 크레용 (2026-11-14 대표님 — HUSS 특강 덱 assets/fx/gold_crayon.js 의 질감을 달력 칸 크기로 줄인 것) ──

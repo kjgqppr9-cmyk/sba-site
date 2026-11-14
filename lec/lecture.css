@@ -306,7 +306,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 /* 칸은 정사각형. 넓어져도 62px 에서 멈추고 가운데로 모인다 */
 .slp .cd{position:relative;width:100%;max-width:62px;aspect-ratio:1;justify-self:center;
   min-width:0;border:none;background:transparent;
-  font-family:inherit;font-size:16px;font-weight:600;color:var(--ink2);border-radius:14px;
+  font-family:inherit;font-size:16px;font-weight:600;color:var(--ink2);border-radius:var(--cr,14px);   /* 둥근값 = 칸 폭 × 0.3(lecture.js psFit, s1114tp4) */
   cursor:default;display:flex;align-items:center;justify-content:center;
   transition:background .22s var(--ease),color .22s var(--ease),
              box-shadow .22s var(--ease),transform .24s var(--pop)}
@@ -396,7 +396,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
    선 체계: 큰 선 2px(초청 테 · 체크) / 작은 요소 1px(딱지 테 · 작은 기호 받침), 색은 #1E3932 · #006241 · 흰색만(금색은 유료에만). */
 .slp{--ck:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 17'%3E%3Cpath d='M4 8.5 7.2 11.7 14 4.7' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M4 8.5 7.2 11.7 14 4.7' fill='none' stroke='%231E3932' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .slp .cd .cal-td{position:absolute;left:-2px;top:-3px;z-index:5;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
-  width:29px;height:16px;border:1px solid #fff;border-radius:3px;background:#1E3932;color:#fff;font-style:normal;font-size:10px;font-weight:800;
+  width:29px;height:16px;border:1px solid #fff;border-radius:4.8px;background:#1E3932;color:#fff;font-style:normal;font-size:10px;font-weight:800;
   line-height:1;letter-spacing:-.05em;text-shadow:none;pointer-events:none}
 .slp .cd .cal-pk{position:absolute;right:-3px;bottom:-3px;z-index:4;width:20px;height:19px;pointer-events:none;font-style:normal;
   background:var(--ck) center/100% 100% no-repeat;opacity:0;transition:opacity .18s var(--ease)}
@@ -405,13 +405,13 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calfoot{display:flex;flex-wrap:wrap;gap:8px 16px;padding:2px 18px 18px;
   font-size:12.5px;color:var(--ink2)}
 .slp .calfoot span{display:inline-flex;align-items:center;gap:6px}
-.slp .calfoot em{width:16px;height:16px;border-radius:6px;display:inline-block;font-style:normal;
+.slp .calfoot em{width:16px;height:16px;border-radius:4.8px;display:inline-block;font-style:normal;
   position:relative;flex:none}
 .slp .calfoot em.lg{background:var(--green)}
 .slp .calfoot em.lg.iv{background:var(--ivf);box-shadow:inset 0 0 0 1px var(--ive)}
 .slp .calfoot em.lg.pd{background:var(--gcr,var(--gold-f)) 0 0/var(--gts,100% 100%) repeat;animation:var(--gan,none);box-shadow:inset 0 0 0 1px rgba(138,101,18,.25)}
 .slp .calfoot em.lg.dn{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
-.slp .calfoot em.td{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:29px;height:16px;border-radius:3px;
+.slp .calfoot em.td{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:29px;height:16px;border-radius:4.8px;
   background:#1E3932;color:#fff;font-size:10px;font-weight:800;line-height:1;letter-spacing:-.05em;overflow:hidden}
 .slp .calfoot em.pk{width:20px;height:19px;border-radius:0;background:var(--ck) center/100% 100% no-repeat}
 
@@ -442,7 +442,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   .slp .calgrid{gap:3px}
   /* 좁은 화면에서는 칸 폭이 40px 아래로 내려간다. 정사각형을 고집하면
      손가락으로 누르기 힘들어지므로, 높이만 44px 로 받쳐 둔다. */
-  .slp .cd{min-height:44px;font-size:15.5px;border-radius:12px}
+  .slp .cd{min-height:44px;font-size:15.5px}
   .slp .calgrid i.wd{font-size:12.5px}
   .slp .caltop{padding:13px 12px}
   .slp .caltop h3{font-size:18px}
@@ -676,25 +676,23 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 /* 고른 개인 · 필싸 날도 체크만(.cal-pk) — 원판 확대 없음(2026-11-14 A-1) */
 .slp .cd.ps:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .slp .calfoot em.ps{border-radius:50%;background:#D97757}
-.slp .calfoot em.ps.fs{width:16px;height:20px;border-radius:0;background:url(mongttang-face.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,57,50,.18))}
+.slp .calfoot em.ps.fs{width:17px;height:17px;border-radius:0;background:url(mongttang-face.webp?v=4) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,57,50,.18))}
 .slp .mlist li.ps{cursor:default}
 .slp .mlist li.ps:hover{border-color:var(--line);transform:none;box-shadow:none}
 .slp .mlist li.ps.lit{border-color:var(--house)}
 .slp .mlist .nm .pdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:#D97757}
-.slp .mlist li.fs .nm .pdot{width:13px;height:17px;border-radius:0;vertical-align:-3px;background:url(mongttang-face.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,57,50,.18))}
+.slp .mlist li.fs .nm .pdot{width:15px;height:15px;border-radius:0;vertical-align:-2px;background:url(mongttang-face.webp?v=4) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,57,50,.18))}
 @media (prefers-reduced-motion:reduce){.slp .cd.ps::before,.slp .cd.ps::after{animation:none!important;transition:none!important}}
 /* 필싸 = 몽땅이 스티커(2026-11-14 s1114tp2, s1114tp3 대표님). 칸은 일정 없는 날처럼 숫자만(원판 · 테 · 캡슐 없음) — 노랑은 초청 전용.
    몽땅이(흰 테 2px 구운 투명 webp · 아주 옅은 그림자)는 칸 오른쪽 위 귀퉁이 — 오늘 딱지(왼쪽 위) · 체크(오른쪽 아래) · 작은 기호(아래 가운데)와 안 겹침.
    그림 원본: 필싸운영/03. 디자인/몽땅이 상표·저작권_261111/[몽땅이] 기준_정면_컬러_261111.png → lec/mongttang.webp(전신) · mongttang-face.webp(얼굴, 작은 기호 · 범례 · 목록). */
-.slp .cd.ps.fs:not(.pmx){color:var(--ink2);font-weight:600}
-.slp .cd.ps.fs.sun:not(.pmx){color:var(--sun)}
-.slp .cd.ps.fs.sat:not(.pmx){color:var(--sat)}
+.slp .cd.ps.fs:not(.pmx){color:#1E3932;font-weight:800}
 .slp .cd.ps.fs::before,.slp .cd.ps.fs::after{content:none}   /* 필싸 칸 = 숫자만(2026-11-14 s1114tp3) */
-/* 몽땅이 크기 · 자리(s1114tp3 실측): 높이 58→68%(+17%), top -12→-4% — 위 칸(16일 체크)으로 넘어가지 않는다(위 칸 · 옆 칸 겹침 0px).
-   커진 만큼 숫자 오른쪽 위 귀퉁이와 닿으므로 몽땅이를 숫자 뒤(z-index:-1, 칸 isolation 안)에 두고 숫자에 흰 테를 둘러 숫자가 늘 위에 보이게 한다. */
-.slp .cd.ps.fs:not(.pmx){text-shadow:0 0 2px #fff,0 0 2px #fff,0 0 1px #fff}
-.slp .cd .cal-mtg{position:absolute;z-index:-1;right:-7%;top:-4%;height:68%;aspect-ratio:89/116;pointer-events:none;font-style:normal;
-  background:url(mongttang.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1.5px rgba(30,57,50,.22));transform:rotate(8deg)}
+/* 몽땅이 = 얼굴 · 팔 없는 단순한 연필 몸 + 지우개 모자(2026-11-14 s1114tp4 대표님 — 숫자에 표정이 잘려 어색하던 것). 칸 가운데, 숫자 바로 뒤(z-index:-1),
+   칸 높이의 94% — 칸 안에만 있어 위 · 옆 칸 침범이 없다. 흰 테 2px 는 그림에 구웠고 옅은 그림자. */
+.slp .cd.ps.fs:not(.pmx){text-shadow:0 0 1px #fff,0 0 2px #fff,0 0 2px #fff,0 0 3px #fff}   /* 몽땅이 위 숫자 — 얇은 흰 테 */
+.slp .cd .cal-mtg{position:absolute;z-index:-1;left:50%;top:50%;height:94%;aspect-ratio:74/132;pointer-events:none;font-style:normal;
+  background:url(mongttang.webp?v=4) center/contain no-repeat;filter:drop-shadow(0 1px 1.5px rgba(30,57,50,.22));transform:translate(-50%,-50%)}
 
 /* ══ 하루 여러 일정 = A안 (2026-11-14 대표님 확정, GPT 솔 검토안) ══
    하루 일정이 하나인 칸은 위의 예전 규칙 그대로. 둘 이상(.multi)이면 대표 일정은 예전 큰 모양, 나머지는 숫자 아래
@@ -706,14 +704,14 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-marks{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
   height:10px;min-width:10px;justify-content:center;box-sizing:border-box;padding:0 1px;background:#fff;border-radius:99px;
   z-index:2;pointer-events:none;line-height:1}
-.slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;box-sizing:border-box;border-radius:2px;background:var(--green);font-style:normal}
+.slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;box-sizing:border-box;border-radius:2.4px;background:var(--green);font-style:normal}
 .slp .cd .cal-mark.d-done{background:#5E8B78}
-.slp .cd .cal-mark.iv{background:var(--ivf);border:1px solid #D4AE3E;border-radius:2px}   /* 초청 = 노란 둥근 네모(s1114tp3, 8px 라 테만 한 톤 짙게) */
+.slp .cd .cal-mark.iv{background:var(--ivf);border:1px solid #D4AE3E;border-radius:2.4px}   /* 초청 = 노란 둥근 네모(s1114tp3, 8px 라 테만 한 톤 짙게) */
 .slp .cd .cal-mark.iv.d-done{background:var(--ivd);border-color:#D9C793}
 .slp .cd .cal-mark.pd.d-fut{background:linear-gradient(145deg,#F0D58C,#D8A945);box-shadow:inset 0 0 0 1px #8A6512}   /* 8px 는 질감 대신 같은 색감만 */
 .slp .cd .cal-mark.m-mt,.slp .cd .cal-mark.m-ps,.slp .cd .cal-mark.m-fs{border-radius:50%}
 .slp .cd .cal-mark.m-ps{background:#D97757}
-.slp .cd .cal-mark.m-fs{flex-basis:7px;width:7px;height:9px;border-radius:0;background:url(mongttang-face.webp) center/contain no-repeat}
+.slp .cd .cal-mark.m-fs{flex-basis:8px;width:8px;height:8px;border-radius:0;background:url(mongttang-face.webp?v=4) center/contain no-repeat}
 .slp .cd .cal-mark.m-cs{background:none;flex-basis:9px;width:9px;height:9px}
 .slp .cd .cal-mark svg{display:block;width:100%;height:100%;max-width:none;overflow:visible}
 .slp .cd .cal-mark svg path{fill:var(--green);stroke:none}
@@ -721,7 +719,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-more{font-style:normal;font-size:9px;font-weight:800;color:var(--house);letter-spacing:-.02em;line-height:1}
 /* 기호가 하나뿐인 날 = 솔 시안 ② 얇은 흰 외곽(2026-11-14 s1114tp1 대표님): 전체 10px 흰 원 + 8px 평면 단색 점(흰 테 1px).
    그라데이션 · 그림자 · 윤곽선 없음. 둘 다 짝수 지름 · 같은 상자 flex 가운데라 중심이 정확히 맞는다. 지난 일정 점 #5E8B78(.d-done). */
-.slp .cd .cal-marks.solo{width:10px;min-width:10px;height:10px;padding:0;gap:0;border-radius:50%;background:#fff;box-shadow:none}
+.slp .cd .cal-marks.solo{width:12px;min-width:12px;height:12px;padding:0;gap:0;border-radius:50%;background:#fff;box-shadow:none}   /* 12px 원 + 8px 점 = 흰 테 2px(s1114tp4, 둘 다 짝수) */
 .slp .cd .cal-marks.solo .cal-mark{flex:0 0 8px;width:8px;height:8px}
 .slp .cd .cal-marks.solo .m-mt{border:0;border-radius:50%}
 /* 캡슐 안 대표 강의(.pmx) — 같은 속성 규칙을 원판 크기(--psc) 모양에 */
@@ -731,7 +729,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.ps.pmx.ivm.d-done{color:#5E6B5C}
 .slp .cd.ps.pmx.pdm.d-fut{color:#0B3D2A}
 .slp .cd .cal-main{position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc);height:var(--psc);margin:calc(var(--psc) / -2) 0 0 calc(var(--psc) / -2);
-  border-radius:11px;background:var(--green);pointer-events:none;font-style:normal}
+  border-radius:var(--crm,11px);background:var(--green);pointer-events:none;font-style:normal}
 .slp .cd .cal-main.d-done{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
 .slp .cd .cal-main.iv.d-fut{background:var(--ivf);box-shadow:inset 0 0 0 1px var(--ive)}
 .slp .cd .cal-main.iv.d-done{background:var(--ivd);box-shadow:inset 0 0 0 1px var(--ivde)}
