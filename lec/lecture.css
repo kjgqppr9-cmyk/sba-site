@@ -841,3 +841,23 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.pick:not(.has):not(.ps),.slp .cd.ps.fs.pick{border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 var(--dg) var(--house)}
 .slp .cd.pick:not(.has):not(.ps){color:var(--green)}
 .slp .calfoot em.pk{width:16px;height:16px;border-radius:4.8px;background:var(--green);box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 3px var(--house)}
+/* ══ 노랑 통일 + 원 크기 맞춤(2026-11-15 s1115yl1 대표님) ══
+   ① 초청 노랑을 컨설팅의 해바라기 노랑(--csf #F2C94C · 선 --csl · 틈 --cst)으로 통일 — 초록 · 코랄과 밝기가 맞는 노랑. 지난 초청은 그대로 빛바랜 노랑.
+   ② 컨설팅 · 멘토링 원이 칸 전체(62px)를 써서 개인 코랄 원(바깥 지름 --psr 56px)보다 컸다 → 원은 ::before 에 --psr 지름으로 그려 개인 원과 같은 크기.
+      틈 두께도 같은 --dg. 칸 자체는 투명. */
+.slp{--ivf:var(--csf);--ive:var(--csl)}
+.slp .cd.has.iv.d-fut:not(.ps){box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 var(--dg) var(--cst)}
+.slp .cd.has.iv.pick.d-fut:not(.ps){box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 var(--dg) #B58E22}
+.slp .calfoot em.lg.iv{box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 3px var(--cst)}
+.slp .cd.has.cs,.slp .cd.has.mt{background:transparent!important;box-shadow:none!important;isolation:isolate;border-radius:50%}
+.slp .cd.has.cs::before,.slp .cd.has.mt::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:var(--psr);height:var(--psr);
+  margin:calc(var(--psr) / -2) 0 0 calc(var(--psr) / -2);border-radius:50%;box-sizing:border-box;pointer-events:none;
+  background:var(--cf);box-shadow:inset 0 0 0 var(--clw,1.5px) var(--cl),inset 0 0 0 var(--dg) var(--cg)}
+.slp .cd.has.mt.d-fut{--cf:var(--green);--cl:var(--green);--cg:var(--lgp)}
+.slp .cd.has.mt.d-done{--cf:var(--mint);--cl:#5E8B78;--cg:#fff;--clw:1px}
+.slp .cd.has.cs.d-fut{--cf:var(--csf);--cl:var(--csl);--cg:var(--cst)}
+.slp .cd.has.cs.d-done{--cf:var(--ivd);--cl:var(--ivde);--cg:#fff;--clw:1px}
+.slp .cd.has.mt.pick.d-fut{--cg:var(--house)}
+.slp .cd.has.mt.pick.d-done{--cg:#5E8B78}
+.slp .cd.has.cs.pick.d-fut{--cg:#B58E22}
+.slp .cd.has.cs.pick.d-done{--cg:#C9B57A}
