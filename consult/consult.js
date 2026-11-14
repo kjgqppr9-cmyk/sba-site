@@ -162,6 +162,7 @@ window.__sbaConsultRun = function(bm){
     scale = mobile ? Math.min(0.33, 240/H) : 0.68;        /* 반지름 = scale*H/2 → PC 높이의 34%, 모바일 ≈150px */
     shift = mobile ? 0.0 : 0.70;
     offY = mobile ? -0.40 : 0.02;   /* 모바일: 글 아래로 내린다 */
+    for(var q=0;q<labs.length;q++) labs[q]._w=0; tag._w=0;
   }
   var lastNow=0;
   var mouse={x:9,y:9}, mS={x:9,y:9}, tilt={x:0,y:0}, tgt={x:0,y:0}, t0=performance.now()-((/[?&]t=(\d+)/.exec(location.search)||[0,0])[1]*1000), alive=true, raf=0;
@@ -181,18 +182,20 @@ window.__sbaConsultRun = function(bm){
     var nx=x2*sc*H/W, ny=y1*sc;
     return {x:(nx+1)/2*W, y:(1-ny)/2*H};
   }
+  /* 2026-11-16: 모바일에서 라벨 · 금색 태그가 화면 밖으로 잘리지 않게 좌우 16px 안으로 (PC 는 그대로) */
+  function inX(x,el){ if(!mobile) return x; if(!el._w) el._w=el.offsetWidth; var hw=el._w/2; return Math.max(16+hw, Math.min(W-16-hw, x)); }
   function placeLabels(T){
     var e = Math.min(1, Math.max(0, (T-1.9)/1.0));   /* 모인 뒤에 라벨이 떠오른다 */
     for(var k=0;k<6;k++){
       var ang=A0-k*Math.PI/3-rot, v=proj(Math.cos(ang)*1.0, Math.sin(ang)*1.0, 0);
       var ox=Math.cos(ang)*(mobile?34:44), oy=-Math.sin(ang)*(mobile?22:30);   /* 꼭짓점 바깥쪽으로 */
-      labs[k].style.transform='translate(-50%,-50%) translate('+(v.x+ox)+'px,'+(v.y+oy)+'px)';
+      labs[k].style.transform='translate(-50%,-50%) translate('+inX(v.x+ox,labs[k])+'px,'+(v.y+oy)+'px)';
       var fadeL = mobile ? 1 : Math.min(1, Math.max(0, ((v.x+ox) - W*0.50)/(W*0.06)));
       labs[k].style.opacity=e*fadeL;
       labs[k].classList.toggle('on', k===sel && selMix>0.5);
     }
     var sa=A0-sel*Math.PI/3-rot, sv=proj(Math.cos(sa)*1.0, Math.sin(sa)*1.0, 0);
-    tag.style.transform='translate(-50%,0) translate('+(sv.x+Math.cos(sa)*(mobile?34:44))+'px,'+(sv.y-Math.sin(sa)*(mobile?22:30)+(Math.sin(sa)>0.7?-46:18))+'px)';
+    tag.style.transform='translate(-50%,0) translate('+inX(sv.x+Math.cos(sa)*(mobile?34:44),tag)+'px,'+(sv.y-Math.sin(sa)*(mobile?22:30)+(Math.sin(sa)>0.7?-46:18))+'px)';
     tag.classList.toggle('on', T>GATHER+0.3 && selMix>0.6);
   }
   function frame(now){
