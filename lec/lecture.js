@@ -1377,15 +1377,15 @@ function autoStatus(l){
 }
 /* manual = 값을 직접 적은 강의(조기 마감 등). 신청서 판정에서 수동이 우선한다(sgOpen) */
 /* 개인 · 필싸 일정은 여기서 LECTURES 밖으로 꺼낸다 — 아래 코드(목록 · 다음 개강 · 히어로 · 신청)는 강의만 본다.
-   PDAYS["2026-11-19"] = "personal" 처럼 날짜와 종류만 남긴다. PKIND = 종류별 이름 · 칸 클래스. */
+   PDAYS["2026-11-19"] = [{id, kind, from, to}, ...] — 같은 날 여러 기간 일정이 겹쳐도 덮어쓰지 않는다(2026-11-14 A안). PKIND = 종류별 이름 · 칸 클래스. */
 const PKIND = {personal:{name:"개인 일정", cls:""}, feelssa:{name:"필싸 일정", cls:" fs"}};
 const PDAYS = {};
 for(let i = LECTURES.length - 1; i >= 0; i--){
   const l = LECTURES[i];
   if(!PKIND[l.kind]) continue;
   LECTURES.splice(i, 1);
-  const end = l.to || l.from;
-  for(let d = parse(l.from); ymd(d) <= end; d.setDate(d.getDate() + 1)) PDAYS[ymd(d)] = l.kind;
+  const end = l.to || l.from, p = {id:l.id, kind:l.kind, from:l.from, to:end};
+  for(let d = parse(l.from); ymd(d) <= end; d.setDate(d.getDate() + 1)) (PDAYS[ymd(d)] = PDAYS[ymd(d)] || []).push(p);
 }
 LECTURES.forEach(l => { if(l.status === "auto") l.status = autoStatus(l); else l.manual = true; });
 
@@ -1908,32 +1908,57 @@ function calInit(){
   calCur = MONTHS.indexOf(ymd(TODAY).slice(0,7));
   if(calCur === -1) calCur = 0;
 }
+/* 목록 한 줄이 고른 날의 일정인가 — 강의 줄은 그 날(data-k), 기간 줄(개인 · 필싸)은 from <= 고른 날 <= to.
+   캡슐 중간 날짜를 눌러도 그 날 강의 · 멘토링 · 그 기간 줄이 함께 올라온다(2026-11-14 A안). */
+function liOn(li){
+  if(!calPick) return false;
+  const f = li.getAttribute("data-from");
+  return f ? (f <= calPick && calPick <= li.getAttribute("data-to")) : li.getAttribute("data-k") === calPick;
+}
 /* 고른 날은 클래스만 바꾼다. 달력을 통째로 다시 그리면 깜빡이는 것처럼 보인다. */
-function applyPick(move){
+function applyPick(move, fx){
   const host = hostEl(); if(!host) return;
   host.querySelectorAll(".cd").forEach(function(el){
     el.classList.toggle("pick", !!calPick && el.getAttribute("data-d") === calPick);
   });
   host.querySelectorAll(".mlist li").forEach(function(li){
-    const k = li.getAttribute("data-k");
-    li.classList.toggle("dim", !!calPick && k !== calPick);
-    li.classList.toggle("lit", !!calPick && k === calPick);
+    const on = liOn(li);
+    li.classList.toggle("dim", !!calPick && !on);
+    li.classList.toggle("lit", on);
   });
-  if(move) pickToTop(host);
+  if(move) pickToTop(host, fx);
+}
+/* 누른 칸에서 금빛 물결이 한 번 퍼진다(고를 때만) — 눌림이 목록으로 '전해지는' 출발점. transform · opacity 만. */
+function calRipple(cell){
+  if(reduced() || !cell.animate) return;
+  const r = document.createElement("i");
+  r.className = "cal-ripple" + (cell.matches(".ps,.mt") ? " rd" : "");
+  r.setAttribute("aria-hidden", "true");
+  cell.appendChild(r);
+  const an = r.animate([{transform:"scale(.92)", opacity:.9},{transform:"scale(1.75)", opacity:0}],
+                       {id:"cal-ripple", duration:440, easing:"cubic-bezier(.2,.7,.3,1)"});
+  an.onfinish = an.oncancel = function(){ r.remove(); };
 }
 /* 날짜를 누르면 그 날 일정이 목록 맨 위로 올라온다(다른 일정은 흐리게 그 아래에 남는다 — 그 달 흐름을 잃지 않게).
    다시 누르면 날짜 순서로 돌아간다. FLIP: 옮기기 전 위치 → 옮긴 뒤 위치를 transform 으로 메워 제자리로 미끄러진다.
-   튕김 · 확대 · 빛 없이, 모든 항목이 같은 곡선 · 같은 시간으로 동시에 움직인다(시간은 가장 멀리 가는 거리로 정함).
-   (2026-11-14 대표님 — 처음엔 '띠용' 튕김이었으나 부자연스럽다 하셔서 GPT 솔 검토안으로 바꿈) */
-function pickToTop(host){
+   고를 때(fx) 안무 — 2026-11-14 대표님 '밋밋하다, 화려하되 고급스럽게'(처음 띠용 튕김은 싸구려 같다 하셨음):
+     고른 카드: 들림 120ms(위로 4px · 1.6% 커짐 · 그림자 깊어짐) → 이동(넘침 없는 감속 곡선) → 위로 3px 지나쳤다
+       제자리에 한 번 내려앉음 240ms(넘침 폭은 거리와 무관하게 3px 고정 — 멀리 가도 튕기지 않는다)
+       → 도착 순간 금빛 광택이 대각선으로 한 번 쓸고(720ms) · 날짜 글자와 종류 점이 한 번 맥박(380ms).
+     밀려나는 카드: 같은 곡선 · 같은 시간, 들림이 끝날 때 위에서부터 18ms 씩 계단 시차(합계 180ms 까지).
+   되돌릴 때(fx 아님)는 물결 · 들림 · 광택 없이 차분하게 미끄러지기만. 동작 줄이기면 바로 바뀐다.
+   연타: 우리 애니메이션(id cal-list-flip · cal-fx)만 취소하고 지금 보이는 자리에서 이어서 움직인다. */
+function pickToTop(host, fx){
   const ul = host.querySelector("#calList ul"); if(!ul) return;
   const lis = Array.prototype.slice.call(ul.children);
-  const top = li => !!calPick && li.getAttribute("data-k") === calPick;
-  const want = lis.slice().sort((a,b) => (top(b) - top(a)) || (+a.getAttribute("data-i") - +b.getAttribute("data-i")));
+  const want = lis.slice().sort((a,b) => (liOn(b) - liOn(a)) || (+a.getAttribute("data-i") - +b.getAttribute("data-i")));
   const still = reduced() || !ul.animate;
   const before = new Map(lis.map(li => [li, li.getBoundingClientRect().top]));
-  /* 빨리 연달아 눌러도 지금 보이는 자리에서 이어서. 목록 이동(FLIP)만 취소한다 — getAnimations 에는 CSS 전환(흐림 등)도 들어 있다 */
-  if(!still) lis.forEach(li => li.getAnimations && li.getAnimations().forEach(a => { if(a.id === "cal-list-flip") a.cancel(); }));
+  /* 빨리 연달아 눌러도 지금 보이는 자리에서 이어서. 우리 움직임만 취소한다 — getAnimations 에는 CSS 전환(흐림 등)도 들어 있다 */
+  if(!still) lis.forEach(function(li){
+    li.getAnimations && li.getAnimations({subtree:true}).forEach(a => { if(a.id === "cal-list-flip" || a.id === "cal-fx") a.cancel(); });
+    li.querySelectorAll(".fx-sh,.fx-gl").forEach(e => e.remove());
+  });
   want.forEach(li => ul.appendChild(li));
   /* 스크롤은 옮긴 직후(움직임을 걸기 전) 위치로 잰다 — 움직이는 중에 재면 transform 만큼 틀린다 */
   if(calPick){
@@ -1948,16 +1973,84 @@ function pickToTop(host){
       if(need > 0) window.scrollBy({top:Math.min(need, Math.max(0, br.top - 12)), behavior:still ? "auto" : "smooth"});
     }
   }
-  if(!still){
-    const EASE = "cubic-bezier(.3,0,0,1)";   /* 양끝 속도 0, 넘침 없음 */
-    const moves = want.map(li => ({li, dy: before.get(li) - li.getBoundingClientRect().top}));
-    const dist = moves.reduce((m, v) => Math.max(m, Math.abs(v.dy)), 0);
+  if(still) return;
+  const moves = want.map(li => ({li, dy: before.get(li) - li.getBoundingClientRect().top}));
+  const dist = moves.reduce((m, v) => Math.max(m, Math.abs(v.dy)), 0);
+  if(!fx || !calPick){
+    /* 차분한 되돌림 — 양끝 속도 0, 넘침 없음 */
     const duration = Math.min(460, Math.max(240, 220 + .3 * dist));
     moves.forEach(function(v){
       if(Math.abs(v.dy) <= .5) return;
-      v.li.animate([{transform:"translateY("+v.dy+"px)"},{transform:"none"}], {id:"cal-list-flip", duration:duration, easing:EASE});
+      v.li.animate([{transform:"translateY("+v.dy+"px)"},{transform:"none"}], {id:"cal-list-flip", duration:duration, easing:"cubic-bezier(.3,0,0,1)"});
     });
+    return;
   }
+  const LIFT = 120, SETTLE = 240, GO = "cubic-bezier(.22,1,.36,1)";
+  const MOVE = Math.min(560, Math.max(340, 280 + .35 * dist));
+  let nth = 0;
+  moves.forEach(function(v){
+    const li = v.li;
+    if(li.classList.contains("lit")){
+      const T = LIFT + MOVE + SETTLE, o1 = LIFT / T, o2 = (LIFT + MOVE) / T;
+      li.animate([
+        {offset:0,  transform:"translateY("+v.dy+"px)", easing:"cubic-bezier(.3,0,.2,1)"},
+        {offset:o1, transform:"translateY("+(v.dy - 4)+"px) scale(1.016)", easing:GO},
+        {offset:o2, transform:"translateY(-3px) scale(1.016)", easing:"cubic-bezier(.3,0,.2,1)"},
+        {offset:1,  transform:"none"}
+      ], {id:"cal-list-flip", duration:T});
+      /* 그림자는 따로 깐 층의 투명도로만(box-shadow 를 직접 움직이면 매 장 다시 그린다) */
+      const sh = document.createElement("i"); sh.className = "fx-sh"; sh.setAttribute("aria-hidden", "true");
+      const gl = document.createElement("i"); gl.className = "fx-gl"; gl.setAttribute("aria-hidden", "true"); gl.appendChild(document.createElement("i"));
+      li.appendChild(sh); li.appendChild(gl);
+      const sa = sh.animate([{opacity:0},{opacity:1, offset:o1},{opacity:1, offset:o2},{opacity:0}], {id:"cal-fx", duration:T, easing:"ease-out"});
+      sa.onfinish = function(){ sh.remove(); };
+      const ga = gl.firstChild.animate([{transform:"translateX(-120%) skewX(-20deg)", opacity:0},{opacity:1, offset:.25},{opacity:1, offset:.7},{transform:"translateX(260%) skewX(-20deg)", opacity:0}],
+                                       {id:"cal-fx", duration:720, delay:LIFT + MOVE - 60, easing:"cubic-bezier(.45,0,.25,1)", fill:"backwards"});
+      ga.onfinish = function(){ gl.remove(); };
+      li.querySelectorAll(".dd,.nm .pdot,.nm .cdot,.nm .cstar,.nm .crown").forEach(function(e){
+        e.animate([{transform:"none"},{transform:"scale(1.12)", offset:.4},{transform:"none"}],
+                  {id:"cal-fx", duration:380, delay:LIFT + MOVE - 40, easing:"cubic-bezier(.3,0,.2,1)"});
+      });
+    } else {
+      const delay = LIFT + Math.min(180, 18 * nth++);
+      if(Math.abs(v.dy) <= .5) return;
+      li.animate([{transform:"translateY("+v.dy+"px)"},{transform:"none"}], {id:"cal-list-flip", duration:MOVE, delay:delay, easing:GO, fill:"backwards"});
+    }
+  });
+}
+/* ── 하루 여러 일정 = A안(2026-11-14 대표님 확정, GPT 솔 검토안) ──
+   하루 일정이 하나면 예전 모양 그대로. 둘 이상이면 대표 일정은 예전처럼 큰 모양, 나머지는 숫자 아래 8px 작은 기호(.cal-marks).
+   대표 순서: 강의(일반 · 초청 · 유료 동급) → 컨설팅 → 멘토링 → 필싸 → 개인, 같은 종류는 시작 시각 빠른 순(모르면 뒤) → id → 회차.
+   작은 기호는 최대 3개 — 4개를 넘으면(하루 5개 이상) 기호 2개 + '+N'. */
+const DAY_RANK = {lec:0, cs:1, mt:2, fs:3, ps:4};
+function dayItems(k){
+  const a = (IDX[k] || []).map(x => ({lec:x.lec, ses:x.ses, t:startTime(x.lec, x.ses) || "",
+    kind: x.lec.kind === "consult" ? (x.lec.mentor ? "mt" : "cs") : "lec"}));
+  (PDAYS[k] || []).forEach(p => a.push({ps:p, t:"", kind: p.kind === "feelssa" ? "fs" : "ps"}));
+  const id = x => String(x.lec ? x.lec.id : x.ps.id), n = x => (x.ses && +x.ses.n) || 0;
+  return a.sort((x,y) => (DAY_RANK[x.kind] - DAY_RANK[y.kind]) || ((x.t ? 0 : 1) - (y.t ? 0 : 1))
+    || (x.t < y.t ? -1 : x.t > y.t ? 1 : 0) || id(x).localeCompare(id(y)) || (n(x) - n(y)));
+}
+/* 화면 읽기 프로그램용 — 그 날 일정 전부 */
+function dayLabel(k, items){
+  const dt = parse(k);
+  return dt.getFullYear()+"년 "+(dt.getMonth()+1)+"월 "+dt.getDate()+"일, 일정 "+items.length+"개. " + items.map(function(x){
+    if(x.ps) return PKIND[x.ps.kind].name;
+    const t = x.t ? (+x.t.slice(0,2))+"시"+(x.t.slice(3) !== "00" ? " "+(+x.t.slice(3))+"분" : "")+" " : "";
+    const w = x.kind === "cs" ? "컨설팅" : x.kind === "mt" ? "멘토링" : x.lec.kind === "invite" ? "초청 강의" : x.lec.paid ? "유료 강의" : "강의";
+    return t + x.lec.title + (x.lec.title.indexOf(w) >= 0 ? "" : " " + w);   /* "리셋하우스 2차 컨설팅 컨설팅" 처럼 겹치지 않게 */
+  }).join(", ") + ".";
+}
+function dayMark(x){
+  if(x.ps) return '<i class="cal-mark m-'+x.kind+'"></i>';
+  return '<i class="cal-mark m-'+x.kind+' d-'+x.lec.status+(x.lec.kind === "invite" ? " iv" : "")+(x.lec.paid ? " pd" : "")+'">'
+    + (x.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>';
+}
+function dayMarks(rest){
+  if(!rest.length) return "";
+  const show = rest.length > 3 ? rest.slice(0, 2) : rest;
+  return '<span class="cal-marks" aria-hidden="true">' + show.map(dayMark).join("")
+    + (rest.length > 3 ? '<i class="cal-more">+'+(rest.length - 2)+'</i>' : '') + '</span>';
 }
 /* 개인 · 필싸 일정 원 크기 — 칸 실제 폭(소수 px)에서 정한다.
    --psc 안쪽 원판 지름, --psr 바깥 테두리 원 지름, --pstep 칸 가운데 사이 거리(캡슐 길이).
@@ -2002,26 +2095,17 @@ function renderSched(dir){
   }).join("");
 
   const first = new Date(y, mo-1, 1).getDay(), last = new Date(y, mo, 0).getDate();
-  /* 개인 · 필싸 일정 묶음. pRows = 목록 한 줄(같은 종류로 이어진 날, 주를 넘어도 한 줄),
-     pRun[날짜] = 그 날이 속한 목록 줄의 첫날(눌렀을 때 고를 값), psSeg[날짜] = 줄(주) 안 캡슐 길이(첫 칸에만). */
-  const pRows = {}, pRun = {}, psSeg = {}, psEnd = {};
-  const pOn = kk => !!PDAYS[kk] && !IDX[kk];
-  Object.keys(PDAYS).filter(k => k.slice(0,7) === MONTHS[calCur] && !IDX[k]).sort().forEach(function(k){
-    const dt = parse(k), pv = new Date(dt); pv.setDate(dt.getDate() - 1);
-    const run = Object.keys(pRows).filter(s => pRows[s].end === ymd(pv) && pRows[s].kind === PDAYS[k])[0];
-    if(run){ pRows[run].end = k; pRun[k] = run; } else { pRows[k] = {end:k, kind:PDAYS[k]}; pRun[k] = k; }
-  });
+  /* 개인 · 필싸 캡슐. 다른 일정과 같은 날이어도 끊지 않는다(예전 !IDX 조건 없앰, 2026-11-14 A안).
+     capK[날짜] = 그 날 캡슐 종류(둘 다면 필싸가 대표), psSeg[날짜] = 줄(주) 안 캡슐 길이(첫 칸에만), psEnd = 줄 끝 칸. */
+  const psSeg = {}, psEnd = {};
+  const capK = kk => { const a = PDAYS[kk]; return !a ? "" : a.some(p => p.kind === "feelssa") ? "feelssa" : a[0].kind; };
   for(let d=1; d<=last; d++){
-    const k = y+"-"+p2(mo)+"-"+p2(d);
-    if(!pOn(k)) continue;
+    const k = y+"-"+p2(mo)+"-"+p2(d), c = capK(k);
+    if(!c) continue;
     const prev = y+"-"+p2(mo)+"-"+p2(d-1);
-    if(d > 1 && (first + d - 1) % 7 !== 0 && pOn(prev) && PDAYS[prev] === PDAYS[k]) continue;   /* 줄 안에서 이어지는 중간 날 */
+    if(d > 1 && (first + d - 1) % 7 !== 0 && capK(prev) === c) continue;   /* 줄 안에서 이어지는 중간 날 */
     let n = 1;
-    while(d+n <= last && (first + d + n - 1) % 7 !== 0){
-      const kk = y+"-"+p2(mo)+"-"+p2(d+n);
-      if(!pOn(kk) || PDAYS[kk] !== PDAYS[k]) break;
-      n++;
-    }
+    while(d+n <= last && (first + d + n - 1) % 7 !== 0 && capK(y+"-"+p2(mo)+"-"+p2(d+n)) === c) n++;
     psSeg[k] = n;
     if(n > 1) psEnd[y+"-"+p2(mo)+"-"+p2(d+n-1)] = true;
   }
@@ -2029,31 +2113,38 @@ function renderSched(dir){
   for(let i=0;i<first;i++) h += '<button class="cd pad" tabindex="-1"></button>';
   for(let d=1; d<=last; d++){
     const k = y+"-"+p2(mo)+"-"+p2(d);
-    const hit = IDX[k];
+    const items = dayItems(k), main = items[0], multi = items.length > 1;
     const dow = (first + d - 1) % 7;
     const wk = dow===0 ? " sun" : dow===6 ? " sat" : "";
     const td = (k === ymd(TODAY)) ? " today" : "";
     const pk = (k === calPick) ? " pick" : "";
-    /* 강의일은 테두리 없는 둥근 사각형으로 채운다. 상태가 곧 색이고,
-       초청 강의는 그 위에 금색 점을 하나 더 단다. */
-    /* 컨설팅은 네모 대신 별이다. 색 규칙(앞으로 진초록, 지난 것 민트)은 그대로. */
-    /* 멘토링(mentor:true)은 별 대신 초록 동그라미 */
-    const mt = !!hit && hit[0].lec.kind === "consult" && !!hit[0].lec.mentor;
-    const cs = !!hit && hit[0].lec.kind === "consult" && !mt;
- /* 개인 · 필싸 일정(강의가 없는 날만) — 동그라미. 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg) */
-    const ps = !hit && !!PDAYS[k];
-    const cls = ps ? " ps" + PKIND[PDAYS[k]].cls + (psSeg[k] === 1 ? " one" : psSeg[k] > 1 ? " cap" : "") + (psEnd[k] ? " capend" : "") : hit
-      ? " has d-" + hit[0].lec.status + (hit[0].lec.kind === "invite" ? " iv" : "") + (hit[0].lec.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "")
-      : "";
-    const pk2 = ps && !pk && pRun[k] === calPick ? " pick" : "";
-    h += '<button class="cd'+cls+wk+td+pk+pk2+'"'
-       + (psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
-       + (hit ? ' data-d="'+k+'" aria-label="'+d+'일 '+esc(hit[0].lec.title)+'"'
-              : ps ? ' data-d="'+pRun[k]+'" aria-label="'+d+'일 '+PKIND[PDAYS[k]].name+'"' : ' tabindex="-1"')
-       + '>'+(cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
-       +(hit && hit[0].lec.paid && hit[0].lec.status !== "done"
-              ? '<i class="pdshn" aria-hidden="true"></i><i class="pdx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></i>'
-              : '')+'</button>';
+    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1">'+d+'</button>'; continue; }
+    /* 강의일은 테두리 없는 둥근 사각형으로 채운다. 상태가 곧 색이고, 초청 강의는 그 위에 금색 점을 하나 더 단다.
+       컨설팅은 네모 대신 별, 멘토링(mentor:true)은 초록 동그라미. 색 규칙(앞으로 진초록, 지난 것 민트)은 같다.
+       개인 · 필싸 일정은 동그라미, 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
+    const c = capK(k), L = main.lec;
+    /* 캡슐 칸: 기간 일정이 그 날을 지나가면 대표가 강의여도 캡슐은 잇는다(대표 모양은 원판 크기로 캡슐 안에, .pmx).
+       하루짜리(줄 길이 1) 기간 일정이 대표가 아니면 캡슐 없이 작은 기호로만. */
+    const inCap = !!c && (!!main.ps || psSeg[k] !== 1);
+    const sub = multi ? dayMarks(items.slice(1)) : "";
+    const lab = multi ? dayLabel(k, items) : main.ps ? d+"일 "+PKIND[main.ps.kind].name : d+"일 "+L.title;
+    let cls, body;
+    if(inCap){
+      cls = " ps" + PKIND[c].cls + (psSeg[k] === 1 ? " one" : psSeg[k] > 1 ? " cap" : "") + (psEnd[k] ? " capend" : "")
+          + (main.ps ? "" : " pmx d-" + L.status + (L.paid ? " pdm" : ""));
+      body = main.ps ? d : '<i class="cal-main m-'+main.kind+' d-'+L.status+(L.kind === "invite" ? " iv" : "")+(L.paid ? " pd" : "")+'" aria-hidden="true">'
+          + (main.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>' + d;
+    } else {
+      const cs = main.kind === "cs", mt = main.kind === "mt";
+      cls = " has d-" + L.status + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
+      body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
+        + (L.paid && L.status !== "done"
+            ? '<i class="pdshn" aria-hidden="true"></i>' + (multi ? '' : '<i class="pdx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></i>')
+            : '');
+    }
+    h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
+       + (inCap && psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
+       + ' data-d="'+k+'" aria-label="'+esc(lab)+'">' + body + sub + '</button>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
@@ -2086,26 +2177,36 @@ function renderSched(dir){
   }
 
   /* 그 달의 일정 — 누르지 않아도 보인다. 누르면 강의 상세가 열린다. */
-  /* 개인 · 필싸 일정은 이어진 날을 한 줄로: '19~20일 (목~금) · 개인 일정'. 상세 · 신청 없음(pRows 는 위에서 만든다). */
-  const inMonth = Object.keys(IDX).concat(Object.keys(pRows)).filter(k => k.slice(0,7) === MONTHS[calCur]).sort();
-  q("#calList").innerHTML = '<h4>' + mo + '월 일정</h4>' + (inMonth.length
-    ? '<ul>' + inMonth.map(function(k){
-        if(!IDX[k]){
-          const a = parse(k), b = parse(pRows[k].end), one = k === pRows[k].end;
-          return '<li class="ps'+PKIND[pRows[k].kind].cls+'" data-k="'+k+'">'
+  /* 개인 · 필싸 일정은 이어진 날을 한 줄로: '19~20일 (목~금) · 개인 일정'. 상세 · 신청 없음.
+     강의가 있는 날의 기간 일정도 빠지지 않는다 — 강의 줄과 기간 줄을 따로 만들어 날짜순으로 합친다(2026-11-14 A안). */
+  const rows = [];
+  Object.keys(IDX).filter(k => k.slice(0,7) === MONTHS[calCur]).sort().forEach(k => IDX[k].forEach(x => rows.push({k:k, x:x})));
+  Object.keys(PKIND).forEach(function(kind){
+    let cur = null;
+    for(let d=1; d<=last; d++){
+      const k = y+"-"+p2(mo)+"-"+p2(d);
+      if((PDAYS[k] || []).some(p => p.kind === kind)){ if(cur) cur.to = k; else rows.push(cur = {k:k, kind:kind, to:k}); }
+      else cur = null;
+    }
+  });
+  rows.sort((a,b) => a.k < b.k ? -1 : a.k > b.k ? 1 : ((a.kind ? 1 : 0) - (b.kind ? 1 : 0)));
+  q("#calList").innerHTML = '<h4>' + mo + '월 일정</h4>' + (rows.length
+    ? '<ul>' + rows.map(function(r){
+        const k = r.k;
+        if(r.kind){
+          const a = parse(k), b = parse(r.to), one = k === r.to;
+          return '<li class="ps'+PKIND[r.kind].cls+'" data-from="'+k+'" data-to="'+r.to+'">'
             + '<span class="dd">'+(one ? a.getDate() : a.getDate()+'~'+b.getDate())+'일<em>('+WD[a.getDay()]+(one ? '' : '~'+WD[b.getDay()])+')</em></span>'
-            + '<span class="bd"><span class="nm"><i class="pdot" aria-hidden="true"></i>'+PKIND[pRows[k].kind].name+'</span></span></li>';
+            + '<span class="bd"><span class="nm"><i class="pdot" aria-hidden="true"></i>'+PKIND[r.kind].name+'</span></span></li>';
         }
-        return IDX[k].map(function(x){
-          const dt = parse(k);
-          const ed = x.lec.edition ? ' ' + esc(x.lec.edition) : "";
-          return '<li data-k="'+k+'" data-open="'+x.lec.id+'" role="button" tabindex="0">'
+        const x = r.x, dt = parse(k);
+        const ed = x.lec.edition ? ' ' + esc(x.lec.edition) : "";
+        return '<li data-k="'+k+'" data-open="'+x.lec.id+'" role="button" tabindex="0">'
             + '<span class="dd">'+dt.getDate()+'일<em>('+WD[dt.getDay()]+')'+(function(t){ return t ? ' <b style="font-weight:700;font-size:12px">'+t+'</b>' : ""; })(startTime(x.lec, x.ses))+'</em></span>'
             + '<span class="bd"><span class="nm">'+(x.lec.paid ? '<i class="crown" aria-label="유료 강의"></i>' : '')+(x.lec.kind === "consult" ? (x.lec.mentor ? '<i class="cdot" aria-label="멘토링"></i>' : '<i class="cstar" aria-label="컨설팅"></i>') : '')+esc(x.lec.title)+ed
             + (x.lec.sessions.length > 1 ? '<i>'+x.ses.n+'회차</i>' : "") + '</span>'
             + '<span class="tt">'+esc(x.ses.title)+'</span></span>'
             + '<span class="st '+stOf(x.lec).cls+'">'+stOf(x.lec).label+'</span></li>';
-        }).join("");
       }).join("") + '</ul>'
     : '<div class="none">이 달에는 강의가 없습니다.</div>');
   q("#calList").querySelectorAll("li").forEach((li, i) => li.setAttribute("data-i", i));
@@ -2279,7 +2380,8 @@ function onClick(e){
   if(d){
     const k = d.getAttribute("data-d");
     calPick = (calPick === k) ? null : k;
-    applyPick(true);      /* 다시 그리지 않는다 — 클래스만 바꾸고 그 날 일정을 목록 맨 위로 */
+    if(calPick) calRipple(d);
+    applyPick(true, !!calPick);      /* 다시 그리지 않는다 — 클래스만 바꾸고 그 날 일정을 목록 맨 위로(고를 때만 안무) */
     return;
   }
   const o = e.target.closest("[data-open]");

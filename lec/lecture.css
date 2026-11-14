@@ -690,3 +690,67 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist .nm .pdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:#D97757}
 .slp .mlist li.fs .nm .pdot{background:#AD7F0A}
 @media (prefers-reduced-motion:reduce){.slp .cd.ps::before,.slp .cd.ps::after{animation:none!important;transition:none!important}}
+
+/* ══ 하루 여러 일정 = A안 (2026-11-14 대표님 확정, GPT 솔 검토안) ══
+   하루 일정이 하나인 칸은 위의 예전 규칙 그대로. 둘 이상(.multi)이면 대표 일정은 예전 큰 모양, 나머지는 숫자 아래
+   8px 작은 기호 줄(.cal-marks, 흰 알약 위). 기호 색 · 모양 = 범례와 같다(강의 네모 · 지난 강의 민트 · 컨설팅 별 ·
+   멘토링 초록 원 · 개인 코랄 원 · 필싸 겨자 원, 초청 금점 · 유료 금박은 속성). 최대 3개, 넘치면 2개 + '+N'.
+   캡슐이 지나가는 날의 대표가 강의면(.pmx) 원판 대신 대표 모양을 원판 크기(--psc)로 캡슐 안에 그린다 —
+   캡슐 테두리는 예전처럼 원판과 같은 상자 기준(box-shadow), 원판(::before)만 숨긴다. */
+.slp .cd.multi:hover,.slp .cd.multi:active,.slp .cd.multi.pick{transform:none!important}
+.slp .cd .cal-marks{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;align-items:center;gap:3px;
+  height:12px;min-width:16px;justify-content:center;box-sizing:border-box;padding:0 3px;background:#fff;border-radius:99px;box-shadow:0 0 0 1px rgba(30,57,50,.10),0 1px 2px rgba(0,0,0,.08);
+  z-index:2;pointer-events:none;line-height:1}
+.slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;border-radius:2px;background:var(--green);font-style:normal}
+.slp .cd .cal-mark.d-done{background:#A9C7B8}
+.slp .cd .cal-mark.d-running{background:var(--gold)}
+.slp .cd .cal-mark.pd:not(.d-done){background:url("gold-leaf.jpg") center/cover,#E2B83C;box-shadow:inset 0 0 0 1px rgba(140,95,20,.35)}
+.slp .cd .cal-mark.iv::after{content:"";position:absolute;top:-2px;right:-2px;width:4px;height:4px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 1px #fff}
+.slp .cd .cal-mark.m-mt,.slp .cd .cal-mark.m-ps,.slp .cd .cal-mark.m-fs{border-radius:50%}
+.slp .cd .cal-mark.m-ps{background:#D97757}
+.slp .cd .cal-mark.m-fs{background:#AD7F0A}
+.slp .cd .cal-mark.m-cs{background:none;flex-basis:9px;width:9px;height:9px}
+.slp .cd .cal-mark svg{display:block;width:100%;height:100%;max-width:none;overflow:visible}
+.slp .cd .cal-mark svg path{fill:var(--green);stroke:var(--gold);stroke-width:9;stroke-linejoin:round;paint-order:stroke}
+.slp .cd .cal-mark.m-cs.d-done svg path{fill:#A9C7B8;stroke:#BBD8CB}
+.slp .cd .cal-more{font-style:normal;font-size:9px;font-weight:800;color:var(--house);letter-spacing:-.02em;line-height:1}
+/* 캡슐 안 대표 강의(.pmx) */
+.slp .cd.ps.pmx::before{display:none}
+.slp .cd.ps.pmx.d-done{color:#1F5140}
+.slp .cd.ps.pmx.d-running{color:#3A2A06}
+.slp .cd.ps.pmx.pdm:not(.d-done){color:#0B3D2A}
+.slp .cd .cal-main{position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc);height:var(--psc);margin:calc(var(--psc) / -2) 0 0 calc(var(--psc) / -2);
+  border-radius:11px;background:var(--green);pointer-events:none;font-style:normal;transition:transform .3s var(--pop)}
+.slp .cd .cal-main.d-done{background:var(--mint)}
+.slp .cd .cal-main.d-running{background:var(--gold)}
+.slp .cd .cal-main.pd:not(.d-done){background:url("gold-leaf.jpg") center/cover,#E2B83C;box-shadow:0 0 0 2px #F6E3A6}
+.slp .cd .cal-main.m-mt{border-radius:50%}
+.slp .cd .cal-main.m-cs{background:none;border-radius:0}
+.slp .cd .cal-main svg{display:block;width:100%;height:100%;max-width:none;max-height:none;overflow:visible}
+.slp .cd .cal-main svg path{fill:var(--green);stroke:var(--gold);stroke-width:7;stroke-linejoin:round;paint-order:stroke}
+.slp .cd .cal-main.m-cs.d-done svg path{fill:var(--mint);stroke:#BBD8CB}
+.slp .cd .cal-main.iv::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #fff}
+.slp .cd.ps.pmx.pick .cal-main{transform:scale(1.1)}
+/* 범례 안내 한 줄 */
+.slp .calfoot .mxnote{flex-basis:100%;color:var(--ink2);font-size:12px}
+.slp .calfoot em.mx{background:var(--green)}
+.slp .calfoot em.mx::after{content:"";position:absolute;left:50%;bottom:-4px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #fff}
+@container (max-width:600px){
+  .slp .cd .cal-marks{bottom:3px;height:11px;gap:2px;padding:0 2px}
+  .slp .cd .cal-main.iv::after{width:6px;height:6px;top:2px;right:2px}
+}
+
+/* ══ 날짜 고를 때 안무 (2026-11-14 대표님: '밋밋하다 · 화려하되 고급스럽게') — 움직임 값은 lecture.js pickToTop 주석.
+   누른 칸 금빛 물결(.cal-ripple) · 고른 카드 그림자 층(.fx-sh) · 금빛 광택(.fx-gl). 전부 transform · opacity 로만 움직인다.
+   그림자 · 광택 층은 z-index:-1 — 고른 카드(.lit, z-index:1)의 바탕 위 · 글자 아래에 깔려 글자를 덮지 않는다. */
+.slp .cd .cal-ripple{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;font-style:normal;
+  box-shadow:0 0 0 2px rgba(203,162,88,.85),0 0 14px 2px rgba(203,162,88,.35),inset 0 0 10px rgba(0,98,65,.18)}
+.slp .cd .cal-ripple.rd{border-radius:50%}
+.slp .mlist li .fx-sh{position:absolute;inset:0;z-index:-1;border-radius:inherit;pointer-events:none;opacity:0;font-style:normal;
+  box-shadow:0 12px 26px rgba(30,57,50,.16),0 3px 8px rgba(30,57,50,.08)}
+.slp .mlist li .fx-gl{position:absolute;inset:0;z-index:-1;border-radius:inherit;overflow:hidden;pointer-events:none;font-style:normal}
+.slp .mlist li .fx-gl>i{position:absolute;top:-10%;bottom:-10%;left:0;width:42%;font-style:normal;opacity:0;
+  background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(250,236,200,.55) 38%,rgba(255,250,235,.85) 50%,rgba(242,214,150,.5) 62%,rgba(255,255,255,0) 100%)}
+.slp .mlist .dd{transform-origin:left center}
+.slp .mlist .nm .pdot,.slp .mlist .nm .cdot,.slp .mlist .nm .cstar{transform-origin:center}
+@media (prefers-reduced-motion:reduce){.slp .cd .cal-ripple,.slp .mlist li .fx-sh,.slp .mlist li .fx-gl{display:none}}
