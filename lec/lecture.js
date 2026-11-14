@@ -2245,10 +2245,11 @@ function renderSched(dir){
     const td = (k === ymd(TODAY)) ? " today" : "";
     const pk = (k === calPick) ? " pick" : "";
     const cur = td ? ' aria-current="date"' : '';
-    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1"'+cur+'>'+d+'</button>'; continue; }
+    const tdTag = td ? '<i class="cal-td" aria-hidden="true">오늘</i>' : '';   /* 오늘 = 왼쪽 위 「오늘」 딱지(2026-11-14 s1114tp1) */
+    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1"'+cur+'>'+d+tdTag+'</button>'; continue; }
     /* 모양 = 종류, 채움 = 속성(2026-11-14 대표님 확정, GPT 솔 검토안): 강의 네모 · 컨설팅 별 · 멘토링 원 · 개인 · 필싸 코랄 · 겨자 원.
        일반 강의 진초록 채움, 초청 흰 바탕 + 진초록 2px 테두리, 유료 금색 채움(금색은 유료에만). 지난 날(회차 날짜 기준)은 민트.
-       오늘 = 숫자 밑줄, 고른 날 = 칸 네 귀퉁이 꺾쇠(.cal-pk). 개인 · 필싸는 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
+       오늘 = 왼쪽 위 「오늘」 딱지(.cal-td), 고른 날 = 오른쪽 아래 체크(.cal-pk, s1114tp1). 개인 · 필싸는 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
     const c = capK(k), L = main.lec, ds = main.past ? "done" : "fut";
     /* 캡슐 칸: 기간 일정이 그 날을 지나가면 대표가 강의여도 캡슐은 잇는다(대표 모양은 원판 크기로 캡슐 안에, .pmx).
        하루짜리(줄 길이 1) 기간 일정이 대표가 아니면 캡슐 없이 작은 기호로만. */
@@ -2269,7 +2270,7 @@ function renderSched(dir){
     }
     h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
        + (inCap && psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
-       + ' data-d="'+k+'" aria-pressed="'+(pk ? "true" : "false")+'"'+cur+' aria-label="'+esc(lab)+'">' + body + sub + '<i class="cal-pk" aria-hidden="true"></i></button>';
+       + ' data-d="'+k+'" aria-pressed="'+(pk ? "true" : "false")+'"'+cur+' aria-label="'+esc(lab)+'">' + body + sub + '<i class="cal-pk" aria-hidden="true"></i>' + tdTag + '</button>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");

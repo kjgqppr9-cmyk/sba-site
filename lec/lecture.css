@@ -377,14 +377,16 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.has:hover{transform:scale(1.08)}
 .slp .cd.has:active{transform:scale(.97)}
 .slp .cd.has:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-/* 오늘 = 숫자 밑줄(테두리 네모 없음). 고른 날 = 칸 네 귀퉁이 꺾쇠(.cal-pk, 칸 상자 inset:0 기준, 두께 2 · 길이 6px).
-   확대 · 테두리 · 그림자 없음 — 원 · 별 · 캡슐 · 초청 위에서도 귀퉁이는 비어 있어 꺾쇠가 보인다. */
-.slp .cd.today{text-decoration:underline 2px currentColor;text-underline-offset:2px;text-decoration-skip-ink:none}
-.slp{--pkc:#1E3932;--pk:linear-gradient(var(--pkc),var(--pkc)) left top/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) left top/2px 6px no-repeat,
-  linear-gradient(var(--pkc),var(--pkc)) right top/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) right top/2px 6px no-repeat,
-  linear-gradient(var(--pkc),var(--pkc)) left bottom/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) left bottom/2px 6px no-repeat,
-  linear-gradient(var(--pkc),var(--pkc)) right bottom/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) right bottom/2px 6px no-repeat}
-.slp .cd .cal-pk{position:absolute;inset:0;z-index:4;pointer-events:none;font-style:normal;background:var(--pk);opacity:0;transition:opacity .18s var(--ease)}
+/* 오늘 · 고른 날 = 솔 시안 A (2026-11-14 s1114tp1 대표님). 둘 다 일정 모양 바깥 귀퉁이에 걸쳐 모양 · 숫자 · 아래 작은 기호를 가리지 않는다.
+   오늘 = 왼쪽 위 「오늘」 딱지(.cal-td: 25×14 · #1E3932 바탕 · 흰 글자 9px · 흰 테 1px · 모서리 3px).
+   고른 날 = 오른쪽 아래 체크(.cal-pk: 17×16, 흰 바탕 선 위 #1E3932 체크 — 그림은 SVG 한 장, 그라데이션 없음). 오늘+고른 날이면 둘 다.
+   선 체계: 큰 선 2px(초청 테 · 체크) / 작은 요소 1px(딱지 테 · 작은 기호 받침), 색은 #1E3932 · #006241 · 흰색만(금색은 유료에만). */
+.slp{--ck:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 17'%3E%3Cpath d='M4 8.5 7.2 11.7 14 4.7' fill='none' stroke='%23fff' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M4 8.5 7.2 11.7 14 4.7' fill='none' stroke='%231E3932' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.slp .cd .cal-td{position:absolute;left:-1px;top:-3px;z-index:5;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  width:25px;height:14px;border:1px solid #fff;border-radius:3px;background:#1E3932;color:#fff;font-style:normal;font-size:9px;font-weight:800;
+  line-height:1;letter-spacing:-.05em;text-shadow:none;pointer-events:none}
+.slp .cd .cal-pk{position:absolute;right:-2px;bottom:-2px;z-index:4;width:17px;height:16px;pointer-events:none;font-style:normal;
+  background:var(--ck) center/100% 100% no-repeat;opacity:0;transition:opacity .18s var(--ease)}
 .slp .cd.pick .cal-pk{opacity:1}
 
 .slp .calfoot{display:flex;flex-wrap:wrap;gap:8px 16px;padding:2px 18px 18px;
@@ -396,9 +398,9 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calfoot em.lg.iv{background:#fff;box-shadow:inset 0 0 0 2px var(--green)}
 .slp .calfoot em.lg.pd{background:var(--gcr,var(--gold-f)) center/cover no-repeat;box-shadow:inset 0 0 0 1px rgba(138,101,18,.25)}
 .slp .calfoot em.lg.dn{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
-.slp .calfoot em.td{width:auto;height:auto;border-radius:0;background:none;padding:0 2px;font-size:12.5px;font-weight:800;line-height:1.2;color:var(--house);
-  text-decoration:underline 2px currentColor;text-underline-offset:2px;text-decoration-skip-ink:none}
-.slp .calfoot em.pk{border-radius:0;background:var(--pk)}
+.slp .calfoot em.td{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:25px;height:14px;border-radius:3px;
+  background:#1E3932;color:#fff;font-size:9px;font-weight:800;line-height:1;letter-spacing:-.05em;overflow:hidden}
+.slp .calfoot em.pk{width:17px;height:16px;border-radius:0;background:var(--ck) center/100% 100% no-repeat}
 
 /* 그 달의 일정은 누르지 않아도 항상 보인다 */
 .slp .mlist{border-top:1.5px solid var(--line);background:#FCFBF9;padding:18px 20px 20px}
@@ -658,7 +660,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calgrid.psgo .cd.ps.one::before{animation:psRing .75s .2s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes psRing{from{box-shadow:0 0 0 0 var(--pl),0 0 0 0 var(--pc)}}
 @keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
-/* 고른 개인 · 필싸 날도 꺾쇠만(.cal-pk) — 원판 확대 없음(2026-11-14 A-1) */
+/* 고른 개인 · 필싸 날도 체크만(.cal-pk) — 원판 확대 없음(2026-11-14 A-1) */
 .slp .cd.ps:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .slp .calfoot em.ps{border-radius:50%;background:#D97757}
 .slp .calfoot em.ps.fs{background:#AD7F0A}
@@ -676,8 +678,8 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
    캡슐이 지나가는 날의 대표가 강의면(.pmx) 원판 대신 대표 모양을 원판 크기(--psc)로 캡슐 안에 그린다 —
    캡슐 테두리는 예전처럼 원판과 같은 상자 기준(box-shadow), 원판(::before)만 숨긴다. */
 .slp .cd.multi:hover,.slp .cd.multi:active,.slp .cd.multi.pick{transform:none!important}
-.slp .cd .cal-marks{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;align-items:center;gap:3px;
-  height:12px;min-width:16px;justify-content:center;box-sizing:border-box;padding:0 3px;background:#fff;border-radius:99px;box-shadow:0 0 0 1px rgba(30,57,50,.10),0 1px 2px rgba(0,0,0,.08);
+.slp .cd .cal-marks{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;
+  height:10px;min-width:10px;justify-content:center;box-sizing:border-box;padding:0 1px;background:#fff;border-radius:99px;
   z-index:2;pointer-events:none;line-height:1}
 .slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;box-sizing:border-box;border-radius:2px;background:var(--green);font-style:normal}
 .slp .cd .cal-mark.d-done{background:#5E8B78}
@@ -692,18 +694,11 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-mark svg path{fill:var(--green);stroke:none}
 .slp .cd .cal-mark.m-cs.d-done svg path{fill:#5E8B78}
 .slp .cd .cal-more{font-style:normal;font-size:9px;font-weight:800;color:var(--house);letter-spacing:-.02em;line-height:1}
-/* 기호가 하나뿐인 날 — 받침은 동그라미(2026-11-14 대표님). 예전 흰 알약이 'O' 글자처럼 보였던 건 테두리가 굵고 점이 작아서다:
-   받침 12px 원 + 점 8px(흰 테 2px — 둘 다 짝수라 중심이 정확히 맞는다), 아주 옅은 윤곽선 + 그림자로 '받침 원'임을 보인다.
-   컨설팅 별은 10px(받침과 1px 씩 여유). 다른 종류 하나일 때도 같은 원 받침. */
-.slp .cd .cal-marks.solo{width:12px;min-width:12px;height:12px;padding:0;gap:0;border-radius:50%;
-  background:radial-gradient(circle at 50% 35%,#fff 0,#fff 55%,#E9EFEC 100%);
-  box-shadow:0 0 0 .5px rgba(30,57,50,.22),0 1px 2px rgba(0,0,0,.28)}
+/* 기호가 하나뿐인 날 = 솔 시안 ② 얇은 흰 외곽(2026-11-14 s1114tp1 대표님): 전체 10px 흰 원 + 8px 평면 단색 점(흰 테 1px).
+   그라데이션 · 그림자 · 윤곽선 없음. 둘 다 짝수 지름 · 같은 상자 flex 가운데라 중심이 정확히 맞는다. 지난 일정 점 #5E8B78(.d-done). */
+.slp .cd .cal-marks.solo{width:10px;min-width:10px;height:10px;padding:0;gap:0;border-radius:50%;background:#fff;box-shadow:none}
 .slp .cd .cal-marks.solo .cal-mark{flex:0 0 8px;width:8px;height:8px}
 .slp .cd .cal-marks.solo .m-mt{border:0;border-radius:50%}
-/* 초록 칸 위 초록 점은 '구멍'처럼 보여 받침이 'O' 로 읽힌다 → 점에 윗빛을 줘 구슬처럼(같은 초록 계열) */
-.slp .cd .cal-marks.solo .m-mt.d-fut,.slp .cd .cal-marks.solo .m-lec.d-fut:not(.iv):not(.pd){
-  background:radial-gradient(circle at 35% 30%,#5DBB94 0,#108a5c 42%,#00573A 100%)}
-.slp .cd .cal-marks.solo .m-cs{flex-basis:10px;width:10px;height:10px}
 /* 캡슐 안 대표 강의(.pmx) — 같은 속성 규칙을 원판 크기(--psc) 모양에 */
 .slp .cd.ps.pmx::before{display:none}
 .slp .cd.ps.pmx.d-done{color:#1F5140}
@@ -723,8 +718,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 /* 범례 안내 한 줄 */
 .slp .calfoot .mxnote{flex-basis:100%;color:var(--ink2);font-size:12px}
 @container (max-width:600px){
-  .slp .cd .cal-marks{bottom:3px;height:11px;gap:2px;padding:0 2px}
-  .slp .cd .cal-marks.solo{width:12px;min-width:12px;height:12px;padding:0}
+  .slp .cd .cal-marks{bottom:3px}
 }
 
 /* ══ 날짜 고를 때 안무 (2026-11-14 대표님: '밋밋하다 · 화려하되 고급스럽게') — 움직임 값은 lecture.js pickToTop 주석.
