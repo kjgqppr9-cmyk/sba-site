@@ -1250,14 +1250,44 @@ const LECTURES = [
 - **AI 도구 유료 구독**(필수) — Claude 또는 ChatGPT 유료 플랜
 `
   },
-  /* 개인 일정 — 달력에 코랄 동그라미만 찍힌다(이어진 날은 다리로 연결). 이름은 '개인 일정' 뿐,
+  {
+    id:"mentor-irum-1", title:"이룸협동조합 멘토링", edition:"1회차",
+    status:"auto", kind:"consult", mentor:true,
+    host:"연세미래창업보육센터(연세대학교 창업보육센터) 입주기업 · 이룸협동조합",
+    summary:"연세미래창업보육센터(연세대학교 창업보육센터)에 입주한 이룸협동조합과 함께하는 멘토링 첫 회차입니다. "
+        + "이룸협동조합은 청소년 · 대학생 교육 · 멘토링 · 진로 상담을 하는 곳입니다. 홈페이지에서 따로 신청받지 않습니다.",
+    sessions:[
+      {date:"2026-11-16", n:1, title:"연세미래창업보육센터 입주기업 멘토링"}
+    ],
+    time:"오후 3시 30분 ~ 5시 30분",
+    hours:2, capacity:null, enrolled:0,
+    rating:null, ratingCount:0,
+    reviews:[],
+    detail:`
+## 멘토로 참여합니다
+**연세미래창업보육센터**(연세대학교 창업보육센터)에 입주한 **이룸협동조합**과 함께하는 멘토링입니다.
+이룸협동조합은 청소년 · 대학생을 대상으로 교육 · 멘토링 · 진로 상담을 하는 곳입니다.
+
+## 한눈에
+| | |
+| --- | --- |
+| **일시** | 11월 16일(월) 오후 3시 30분 ~ 5시 30분 |
+| **주최** | 연세미래창업보육센터 입주기업 · 이룸협동조합 |
+| **회차** | 1회차 (2 · 3회차 일정은 정해지면 올립니다) |
+| **역할** | 멘토 |
+
+이 홈페이지에서는 신청받지 않습니다.
+`
+  },
+  /* 개인 일정 · 필싸 일정 — 달력에 동그라미만 찍힌다(이어진 날은 캡슐로 연결). 이름은 '개인 일정' / '필싸 일정' 뿐,
      장소 · 내용 · 신청 없음. 강의 목록 · 다음 개강 · 히어로 전환 · 상세 창에는 나오지 않는다.
-     쓰는 법: {id, kind:"personal", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
+     kind:"personal" = 개인 일정(코랄) · kind:"feelssa" = 필싸 일정(머스터드 노랑, 2026-11-14 대표님)
+     쓰는 법: {id, kind:"personal"|"feelssa", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
   {id:"personal-1106", kind:"personal", from:"2026-11-06"},
   {id:"personal-1113", kind:"personal", from:"2026-11-13"},
   {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"},
-  {id:"personal-1123", kind:"personal", from:"2026-11-23"},
-  {id:"personal-1222", kind:"personal", from:"2026-12-22"}
+  {id:"feelssa-1123", kind:"feelssa", from:"2026-11-23"},
+  {id:"feelssa-1222", kind:"feelssa", from:"2026-12-22"}
 ];
 
 /* 동시 모집 히어로 — 신청할 수 있는 강의가 둘 이상일 때 강의 히어로에 나가는 문구(적지 않은 칸은 자동).
@@ -1346,15 +1376,16 @@ function autoStatus(l){
   return "upcoming";
 }
 /* manual = 값을 직접 적은 강의(조기 마감 등). 신청서 판정에서 수동이 우선한다(sgOpen) */
-/* 개인 일정은 여기서 LECTURES 밖으로 꺼낸다 — 아래 코드(목록 · 다음 개강 · 히어로 · 신청)는 강의만 본다.
-   PDAYS["2026-11-19"] = true 처럼 날짜만 남긴다. */
+/* 개인 · 필싸 일정은 여기서 LECTURES 밖으로 꺼낸다 — 아래 코드(목록 · 다음 개강 · 히어로 · 신청)는 강의만 본다.
+   PDAYS["2026-11-19"] = "personal" 처럼 날짜와 종류만 남긴다. PKIND = 종류별 이름 · 칸 클래스. */
+const PKIND = {personal:{name:"개인 일정", cls:""}, feelssa:{name:"필싸 일정", cls:" fs"}};
 const PDAYS = {};
 for(let i = LECTURES.length - 1; i >= 0; i--){
   const l = LECTURES[i];
-  if(l.kind !== "personal") continue;
+  if(!PKIND[l.kind]) continue;
   LECTURES.splice(i, 1);
   const end = l.to || l.from;
-  for(let d = parse(l.from); ymd(d) <= end; d.setDate(d.getDate() + 1)) PDAYS[ymd(d)] = true;
+  for(let d = parse(l.from); ymd(d) <= end; d.setDate(d.getDate() + 1)) PDAYS[ymd(d)] = l.kind;
 }
 LECTURES.forEach(l => { if(l.status === "auto") l.status = autoStatus(l); else l.manual = true; });
 
@@ -1878,7 +1909,7 @@ function calInit(){
   if(calCur === -1) calCur = 0;
 }
 /* 고른 날은 클래스만 바꾼다. 달력을 통째로 다시 그리면 깜빡이는 것처럼 보인다. */
-function applyPick(){
+function applyPick(move){
   const host = hostEl(); if(!host) return;
   host.querySelectorAll(".cd").forEach(function(el){
     el.classList.toggle("pick", !!calPick && el.getAttribute("data-d") === calPick);
@@ -1888,14 +1919,70 @@ function applyPick(){
     li.classList.toggle("dim", !!calPick && k !== calPick);
     li.classList.toggle("lit", !!calPick && k === calPick);
   });
+  if(move) pickToTop(host);
 }
-/* 개인 일정 — 칸 한 개의 실제 폭을 --psd 로 넘긴다(캡슐 크기의 기준, css .psbar). */
+/* 날짜를 누르면 그 날 일정이 목록 맨 위로 올라온다(다른 일정은 흐리게 그 아래에 남는다 — 그 달 흐름을 잃지 않게).
+   다시 누르면 날짜 순서로 돌아간다. FLIP: 옮기기 전 위치 → 옮긴 뒤 위치를 transform 으로 메워 '띠용' 하고 제자리.
+   (2026-11-14 대표님) */
+function pickToTop(host){
+  const ul = host.querySelector("#calList ul"); if(!ul) return;
+  const lis = Array.prototype.slice.call(ul.children);
+  const top = li => !!calPick && li.getAttribute("data-k") === calPick;
+  const want = lis.slice().sort((a,b) => (top(b) - top(a)) || (+a.getAttribute("data-i") - +b.getAttribute("data-i")));
+  const still = reduced() || !ul.animate;
+  const before = new Map(lis.map(li => [li, li.getBoundingClientRect().top]));
+  if(!still) lis.forEach(li => li.getAnimations && li.getAnimations().forEach(a => a.cancel()));   /* 빨리 연달아 눌러도 지금 보이는 자리에서 이어서 */
+  want.forEach(li => ul.appendChild(li));
+  /* 스크롤은 옮긴 직후(움직임을 걸기 전) 위치로 잰다 — 움직이는 중에 재면 transform 만큼 틀린다 */
+  if(calPick){
+    /* 목록 상자가 스스로 스크롤되면 맨 위로, 모바일처럼 목록이 달력 아래 있고 화면 밖이면 목록 머리가 보일 만큼만 내린다 */
+    const box = host.querySelector("#calList");
+    if(box.scrollHeight > box.clientHeight + 2) box.scrollTo({top:0, behavior:still ? "auto" : "smooth"});
+    const grid = host.querySelector("#calGrid");
+    const br = box.getBoundingClientRect(), gr = grid.getBoundingClientRect();
+    if(br.top >= gr.bottom - 1){
+      const first = ul.firstElementChild, vh = window.innerHeight || document.documentElement.clientHeight;
+      const need = (first ? first.getBoundingClientRect().bottom : br.top + 80) + 16 - vh;
+      if(need > 0) window.scrollBy({top:Math.min(need, Math.max(0, br.top - 12)), behavior:still ? "auto" : "smooth"});
+    }
+  }
+  if(!still){
+    const BOING = "cubic-bezier(.34,1.56,.64,1)";
+    want.forEach(function(li){
+      const dy = before.get(li) - li.getBoundingClientRect().top;
+      if(top(li)){
+        li.animate([
+          {transform:"translateY("+dy+"px)", easing:BOING},
+          {transform:"translateY(0) scale(1.035)", offset:.72, easing:"ease-in-out"},
+          {transform:"none"}
+        ], {duration:Math.abs(dy) > 1 ? 680 : 420});
+        li.animate([
+          {boxShadow:"0 0 0 0 rgba(0,98,65,0)"},
+          {boxShadow:"0 0 0 4px rgba(0,98,65,.22), 0 8px 20px rgba(0,0,0,.12)", offset:.6},
+          {boxShadow:"0 6px 16px rgba(0,0,0,.09)"}
+        ], {duration:900, easing:"ease-in-out"});
+      } else if(Math.abs(dy) > .5){
+        li.animate([{transform:"translateY("+dy+"px)"},{transform:"none"}], {duration:560, easing:BOING});
+      }
+    });
+  }
+}
+/* 개인 · 필싸 일정 원 크기 — 칸 실제 폭(소수 px)에서 정한다.
+   --psc 안쪽 원판 지름, --psr 바깥 테두리 원 지름, --pstep 칸 가운데 사이 거리(캡슐 길이).
+   ⚠ 두 지름은 정수 px 이고 차이가 짝수여야 한다(같은 짝 · 홀). 예전엔 바깥 = 칸 폭(61 · 39 같은 홀수),
+   안쪽 = 짝수(50 · 32)라, 화면이 정수 픽셀로 맞출 때 두 원의 중심이 가로 · 세로로 0.5px 씩 엇갈렸다(2026-11-14 실측).
+   하루짜리 테두리는 원판의 box-shadow 라 원판과 같은 상자 — 중심이 어긋날 수가 없다.
+   캡슐도 원판과 같은 높이 · 위치의 상자에 같은 box-shadow 를 둘러 그린다. 원판 지름이 짝수여야 끝 칸 반원 조각과 중심이 맞는다. */
 function psFit(grid){
   const c = grid.querySelector(".cd:not(.pad)");
   if(!c || !c.offsetWidth) return;
-  grid.style.setProperty("--psd", c.offsetWidth + "px");
-  /* 원 지름은 짝수 정수 px — 82% 를 그대로 쓰면 칸마다 소수점이 달라 원이 1px 씩 찌그러져 보인다 */
-  grid.style.setProperty("--psc", Math.round(c.offsetWidth * .82 / 2) * 2 + "px");
+  const w = c.getBoundingClientRect().width;
+  const d = Math.max(8, Math.round(w * .82 / 2) * 2);
+  const r = d + 2 * Math.max(2, Math.ceil((w - d) / 2));   /* 연한 틈이 1.5px 아래로 줄지 않게 올림 */
+  const gs = getComputedStyle(grid), gap = parseFloat(gs.columnGap) || 0;
+  grid.style.setProperty("--psc", d + "px");
+  grid.style.setProperty("--psr", r + "px");
+  grid.style.setProperty("--pstep", ((grid.getBoundingClientRect().width + gap) / 7) + "px");
 }
 function renderSched(dir){
   if(!MONTHS.length) return;
@@ -1923,6 +2010,29 @@ function renderSched(dir){
   }).join("");
 
   const first = new Date(y, mo-1, 1).getDay(), last = new Date(y, mo, 0).getDate();
+  /* 개인 · 필싸 일정 묶음. pRows = 목록 한 줄(같은 종류로 이어진 날, 주를 넘어도 한 줄),
+     pRun[날짜] = 그 날이 속한 목록 줄의 첫날(눌렀을 때 고를 값), psSeg[날짜] = 줄(주) 안 캡슐 길이(첫 칸에만). */
+  const pRows = {}, pRun = {}, psSeg = {}, psEnd = {};
+  const pOn = kk => !!PDAYS[kk] && !IDX[kk];
+  Object.keys(PDAYS).filter(k => k.slice(0,7) === MONTHS[calCur] && !IDX[k]).sort().forEach(function(k){
+    const dt = parse(k), pv = new Date(dt); pv.setDate(dt.getDate() - 1);
+    const run = Object.keys(pRows).filter(s => pRows[s].end === ymd(pv) && pRows[s].kind === PDAYS[k])[0];
+    if(run){ pRows[run].end = k; pRun[k] = run; } else { pRows[k] = {end:k, kind:PDAYS[k]}; pRun[k] = k; }
+  });
+  for(let d=1; d<=last; d++){
+    const k = y+"-"+p2(mo)+"-"+p2(d);
+    if(!pOn(k)) continue;
+    const prev = y+"-"+p2(mo)+"-"+p2(d-1);
+    if(d > 1 && (first + d - 1) % 7 !== 0 && pOn(prev) && PDAYS[prev] === PDAYS[k]) continue;   /* 줄 안에서 이어지는 중간 날 */
+    let n = 1;
+    while(d+n <= last && (first + d + n - 1) % 7 !== 0){
+      const kk = y+"-"+p2(mo)+"-"+p2(d+n);
+      if(!pOn(kk) || PDAYS[kk] !== PDAYS[k]) break;
+      n++;
+    }
+    psSeg[k] = n;
+    if(n > 1) psEnd[y+"-"+p2(mo)+"-"+p2(d+n-1)] = true;
+  }
   let h = WD.map(w => '<i class="wd">'+w+'</i>').join("");
   for(let i=0;i<first;i++) h += '<button class="cd pad" tabindex="-1"></button>';
   for(let d=1; d<=last; d++){
@@ -1938,35 +2048,20 @@ function renderSched(dir){
     /* 멘토링(mentor:true)은 별 대신 초록 동그라미 */
     const mt = !!hit && hit[0].lec.kind === "consult" && !!hit[0].lec.mentor;
     const cs = !!hit && hit[0].lec.kind === "consult" && !mt;
- /* 개인 일정(강의가 없는 날만) — 코랄 동그라미. 같은 주 안에서 이어진 날은 아래 psbar 가 잇는다 */
+ /* 개인 · 필싸 일정(강의가 없는 날만) — 동그라미. 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg) */
     const ps = !hit && !!PDAYS[k];
-    const cls = ps ? " ps" : hit
+    const cls = ps ? " ps" + PKIND[PDAYS[k]].cls + (psSeg[k] === 1 ? " one" : psSeg[k] > 1 ? " cap" : "") + (psEnd[k] ? " capend" : "") : hit
       ? " has d-" + hit[0].lec.status + (hit[0].lec.kind === "invite" ? " iv" : "") + (hit[0].lec.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "")
       : "";
-    h += '<button class="cd'+cls+wk+td+pk+'"'
-       + (hit ? ' data-d="'+k+'" aria-label="'+d+'일 '+esc(hit[0].lec.title)+'"' : ' tabindex="-1"' + (ps ? ' aria-label="'+d+'일 개인 일정"' : ''))
+    const pk2 = ps && !pk && pRun[k] === calPick ? " pick" : "";
+    h += '<button class="cd'+cls+wk+td+pk+pk2+'"'
+       + (psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
+       + (hit ? ' data-d="'+k+'" aria-label="'+d+'일 '+esc(hit[0].lec.title)+'"'
+              : ps ? ' data-d="'+pRun[k]+'" aria-label="'+d+'일 '+PKIND[PDAYS[k]].name+'"' : ' tabindex="-1"')
        + '>'+(cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
        +(hit && hit[0].lec.paid && hit[0].lec.status !== "done"
               ? '<i class="pdshn" aria-hidden="true"></i><i class="pdx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></i>'
               : '')+'</button>';
-  }
-  /* 이어진 개인 일정의 다리 — 줄(주)마다 따로 그린다. 절대 위치 격자 항목이라 칸 자리 배치에 끼어들지 않고,
-     grid-column/row 로 잡은 영역 안에서 첫 칸 가운데 ~ 끝 칸 가운데만 덮는다(css .psbar). */
-  for(let d=1; d<=last; d++){
-    const k = y+"-"+p2(mo)+"-"+p2(d);
-    if(IDX[k] || !PDAYS[k]) continue;
-    const prev = y+"-"+p2(mo)+"-"+p2(d-1);
-    const dow = (first + d - 1) % 7;
-    if(d > 1 && dow !== 0 && PDAYS[prev] && !IDX[prev]) continue;   /* 줄 안에서 이어지는 중간 날 */
-    let n = 1;
-    while(d+n <= last && (first + d + n - 1) % 7 !== 0){
-      const kk = y+"-"+p2(mo)+"-"+p2(d+n);
-      if(!PDAYS[kk] || IDX[kk]) break;
-      n++;
-    }
-    /* 하루짜리도 같은 테두리 원(이중 원)을 두른다 — n=1 이면 캡슐이 원이 된다 (11/4 대표님) */
-    const row = 2 + Math.floor((first + d - 1) / 7);
-    h += '<i class="psbar'+(n === 1 ? ' one' : '')+'" aria-hidden="true" style="grid-column:'+(dow+1)+' / span '+n+';grid-row:'+row+' / span 1;--n:'+n+'"><i class="pb"></i></i>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
@@ -1977,8 +2072,18 @@ function renderSched(dir){
     if(window.ResizeObserver) new ResizeObserver(function(){ psFit(grid); }).observe(grid);
     else window.addEventListener("resize", function(){ psFit(grid); });
   }
-  /* 다리는 달력이 처음 화면에 들어올 때 왼쪽에서 오른쪽으로 차오른다(한 번 켜지면 달을 넘겨도 바로 그린다) */
-  if(grid.querySelector(".psbar") && !grid.classList.contains("psgo") && !grid.__psio){
+  if(!grid.__psmq && window.matchMedia){
+    /* 화면 배율(devicePixelRatio)이 바뀌면 원 크기를 다시 잰다 */
+    grid.__psmq = true;
+    const watch = function(){
+      const mq = matchMedia("(resolution: " + (window.devicePixelRatio || 1) + "dppx)");
+      const on = function(){ mq.removeEventListener ? mq.removeEventListener("change", on) : mq.removeListener(on); psFit(grid); watch(); };
+      mq.addEventListener ? mq.addEventListener("change", on) : mq.addListener(on);
+    };
+    watch();
+  }
+  /* 캡슐 · 테두리 원은 달력이 처음 화면에 들어올 때 펼쳐진다(한 번 켜지면 달을 넘겨도 바로 그린다) */
+  if(grid.querySelector(".cd.ps") && !grid.classList.contains("psgo") && !grid.__psio){
     if(reduced() || !("IntersectionObserver" in window)) grid.classList.add("psgo");
     else {
       grid.__psio = new IntersectionObserver(function(es){
@@ -1989,21 +2094,15 @@ function renderSched(dir){
   }
 
   /* 그 달의 일정 — 누르지 않아도 보인다. 누르면 강의 상세가 열린다. */
-  /* 개인 일정은 이어진 날을 한 줄로: '19~20일 (목~금) · 개인 일정'. 누를 곳 없음(상세 · 신청 없음). */
-  const pRows = {};
-  Object.keys(PDAYS).filter(k => k.slice(0,7) === MONTHS[calCur] && !IDX[k]).sort().forEach(function(k){
-    const dt = parse(k), pv = new Date(dt); pv.setDate(dt.getDate() - 1);
-    const run = Object.keys(pRows).filter(s => pRows[s].end === ymd(pv))[0];
-    if(run) pRows[run].end = k; else pRows[k] = {end:k};
-  });
+  /* 개인 · 필싸 일정은 이어진 날을 한 줄로: '19~20일 (목~금) · 개인 일정'. 상세 · 신청 없음(pRows 는 위에서 만든다). */
   const inMonth = Object.keys(IDX).concat(Object.keys(pRows)).filter(k => k.slice(0,7) === MONTHS[calCur]).sort();
   q("#calList").innerHTML = '<h4>' + mo + '월 일정</h4>' + (inMonth.length
     ? '<ul>' + inMonth.map(function(k){
         if(!IDX[k]){
           const a = parse(k), b = parse(pRows[k].end), one = k === pRows[k].end;
-          return '<li class="ps" data-k="'+k+'">'
+          return '<li class="ps'+PKIND[pRows[k].kind].cls+'" data-k="'+k+'">'
             + '<span class="dd">'+(one ? a.getDate() : a.getDate()+'~'+b.getDate())+'일<em>('+WD[a.getDay()]+(one ? '' : '~'+WD[b.getDay()])+')</em></span>'
-            + '<span class="bd"><span class="nm"><i class="pdot" aria-hidden="true"></i>개인 일정</span></span></li>';
+            + '<span class="bd"><span class="nm"><i class="pdot" aria-hidden="true"></i>'+PKIND[pRows[k].kind].name+'</span></span></li>';
         }
         return IDX[k].map(function(x){
           const dt = parse(k);
@@ -2017,7 +2116,8 @@ function renderSched(dir){
         }).join("");
       }).join("") + '</ul>'
     : '<div class="none">이 달에는 강의가 없습니다.</div>');
-  applyPick();
+  q("#calList").querySelectorAll("li").forEach((li, i) => li.setAttribute("data-i", i));
+  applyPick(true);
 }
 function calGo(step){
   const n = calCur + step;
@@ -2183,11 +2283,11 @@ function onClick(e){
   }
   if(e.target.closest(".prev")){ calGo(-1); return; }
   if(e.target.closest(".next")){ calGo(1); return; }
-  const d = e.target.closest(".cd.has");
+  const d = e.target.closest(".cd.has,.cd.ps");
   if(d){
     const k = d.getAttribute("data-d");
     calPick = (calPick === k) ? null : k;
-    applyPick();          /* 다시 그리지 않는다 — 클래스만 바꾼다 */
+    applyPick(true);      /* 다시 그리지 않는다 — 클래스만 바꾸고 그 날 일정을 목록 맨 위로 */
     return;
   }
   const o = e.target.closest("[data-open]");

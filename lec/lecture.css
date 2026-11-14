@@ -649,28 +649,46 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .af-kakao{background:#FFF8E1;border:2px solid #F2D27A;border-radius:16px;padding:14px 16px;margin:0 0 16px;font-size:14px;line-height:1.7;color:#5b4a12;text-align:center}
 .slp .af-kakao a{display:inline-block;margin-top:8px;background:#006241;color:#fff;font-weight:800;border-radius:999px;padding:9px 18px;text-decoration:none}
 
-/* ── 개인 일정 (2026-11-02 대표님 확정 A-2) — 평면 코랄 원 #D97757 · 흰 숫자 800 · 그림자 · 그라데이션 없음(진초록 칸과 같은 결).
-   이어진 날은 .psbar(절대 위치 격자 항목, 첫 칸 가운데 ~ 끝 칸 가운데)가 잇는다. 그 안 .pb = 연한 코랄 캡슐 + 1.5px 코랄 테두리,
-   바깥 크기는 칸과 같다(--psd = 칸 실제 폭, JS psFit). (가운데 다이아는 2026-11-02 대표님 지시로 뺐다)
-   모션: 처음 보일 때 캡슐이 왼쪽에서 펼쳐진다(.psgo). 동작 줄이기면 정지. ── */
-.slp .calgrid{position:relative;--cg:4px;--psd:56px}
-.slp .psbar{position:absolute;z-index:0;pointer-events:none;top:0;bottom:0;font-style:normal;
-  left:calc((100% - (var(--n) - 1) * var(--cg)) / var(--n) / 2);right:calc((100% - (var(--n) - 1) * var(--cg)) / var(--n) / 2)}
-.slp .psbar>.pb{position:absolute;display:block;font-style:normal;top:50%;left:calc(var(--psd) / -2);right:calc(var(--psd) / -2);
-  height:var(--psd);margin-top:calc(var(--psd) / -2);border-radius:999px;background:#F9E6DE;border:1.5px solid #D97757;
-  box-sizing:border-box;transform-origin:left center}
-.slp .calgrid.psgo .psbar>.pb{animation:psUnroll .9s .2s cubic-bezier(.3,.75,.25,1) both}
-.slp .psbar.one>.pb{transform-origin:center}
-.slp .calgrid.psgo .psbar.one>.pb{animation-name:psPop}
-@keyframes psPop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
-@keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
-.slp .cd.ps{z-index:1;isolation:isolate;color:#fff;font-weight:800}
+/* ── 개인 일정(2026-11-02 대표님 확정 A-2, 코랄) · 필싸 일정(2026-11-14 대표님, 머스터드 노랑)
+   평면 원판(--pc) · 흰 숫자 800 · 그림자 · 그라데이션 없음. 바깥 테두리 원 / 캡슐 = 연한 채움(--pl) + 1.5px 테두리(--pc).
+   ⚠ 중심 맞추기(2026-11-14): 원판과 테두리는 둘 다 그 칸(.cd) 한 상자를 기준으로 그린다.
+     하루짜리(.one) = 원판(::before)의 box-shadow 두 겹 — 같은 상자라 중심이 어긋날 수가 없다.
+     이어진 날 = 그 줄 첫 칸(.cap)의 ::after 가 원판과 똑같은 높이 · 위치의 긴 상자를 깔고 같은 box-shadow 두 겹으로 캡슐 테두리를 그린다
+       (세로 · 왼쪽 끝이 원판과 같은 상자 기준). 칸 사이 거리가 소수 px 라 오른쪽 끝이 1px 흔들리므로, 끝 칸(.capend)이
+       자기 원판 기준으로 오른쪽 반원 조각을 덮어 그린다(왼쪽은 clip-path 로 잘라 이음매가 없다).
+     크기는 JS psFit: --psc 원판 지름 · --psr 테두리 지름(둘 다 짝수 정수 px) · --pstep 칸 가운데 사이 거리.
+     (예전 구조: 테두리는 칸 밖 격자 항목 .psbar, 지름 = 칸 폭 정수(61 · 39 같은 홀수) ↔ 원판 짝수(50 · 32)
+      → 정수 픽셀에 맞춰 그릴 때 두 원 중심이 가로 · 세로 0.5px 씩 엇갈렸다.)
+   모션: 처음 보일 때 테두리 원이 원판에서 퍼지고(띠용), 캡슐은 왼쪽에서 펼쳐진다(.psgo). 동작 줄이기면 정지. ── */
+.slp .calgrid{position:relative;--psc:46px;--psr:56px;--pstep:64px}
+.slp .cd.ps{--pc:#D97757;--pl:#F9E6DE;--psg:calc((var(--psr) - var(--psc)) / 2);z-index:1;isolation:isolate;color:#fff;font-weight:800;cursor:pointer}
+.slp .cd.ps.fs{--pc:#AD7F0A;--pl:#FAEFCF}
 .slp .cd.ps.sun,.slp .cd.ps.sat{color:#fff}
-.slp .cd.ps::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc,82%);height:var(--psc,auto);max-width:none;max-height:none;aspect-ratio:1;
-  margin:calc(var(--psc,0px) / -2) 0 0 calc(var(--psc,0px) / -2);border-radius:50%;background:#D97757}
+.slp .cd.ps::before{content:"";position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc);height:var(--psc);max-width:none;max-height:none;
+  margin:calc(var(--psc) / -2) 0 0 calc(var(--psc) / -2);border-radius:50%;background:var(--pc);box-sizing:border-box;
+  transition:transform .3s var(--pop)}
+.slp .cd.ps.one::before,.slp .cd.ps.cap::after,.slp .cd.ps.capend::after{box-shadow:0 0 0 calc(var(--psg) - 1.5px) var(--pl),0 0 0 var(--psg) var(--pc)}
+.slp .cd.ps.cap::after,.slp .cd.ps.capend::after{content:"";position:absolute;z-index:-2;left:50%;top:50%;pointer-events:none;box-sizing:border-box;
+  height:var(--psc);max-width:none;max-height:none;background:var(--pl)}
+.slp .cd.ps.cap::after{width:calc((var(--n) - 1) * var(--pstep) + var(--psc) - 3px);
+  margin:calc(var(--psc) / -2) 0 0 calc(var(--psc) / -2);border-radius:999px;transform-origin:calc(var(--psc) / 2) 50%}
+.slp .cd.ps.capend::after{width:calc(var(--psc) / 2 + 10px);margin:calc(var(--psc) / -2) 0 0 -10px;border-radius:0 999px 999px 0;
+  clip-path:inset(calc(-2px - var(--psg)) calc(-2px - var(--psg)) calc(-2px - var(--psg)) 0)}
+.slp .calgrid.psgo .cd.ps.cap::after{animation:psUnroll .9s .2s cubic-bezier(.3,.75,.25,1) both}
+.slp .calgrid.psgo .cd.ps.capend::after{animation:psFade .3s .9s ease-out both}
+@keyframes psFade{from{opacity:0}}
+.slp .calgrid.psgo .cd.ps.one::before{animation:psRing .75s .2s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes psRing{from{box-shadow:0 0 0 0 var(--pl),0 0 0 0 var(--pc)}}
+@keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
+/* 고른 개인 · 필싸 날 — 네모 테두리 대신 원판만 살짝 커진다(캡슐은 그대로) */
+.slp .cd.ps.pick,.slp .cd.ps.pick.today{outline:none;box-shadow:none;transform:none}
+.slp .cd.ps.pick::before{transform:scale(1.1)}
+.slp .cd.ps:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .slp .calfoot em.ps{border-radius:50%;background:#D97757}
+.slp .calfoot em.ps.fs{background:#AD7F0A}
 .slp .mlist li.ps{cursor:default}
 .slp .mlist li.ps:hover{border-color:var(--line);transform:none;box-shadow:none}
+.slp .mlist li.ps.lit{border-color:var(--house)}
 .slp .mlist .nm .pdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:#D97757}
-@container (max-width:600px){.slp .calgrid{--cg:3px}}
-@media (prefers-reduced-motion:reduce){.slp .psbar>.pb{animation:none!important}}
+.slp .mlist li.fs .nm .pdot{background:#AD7F0A}
+@media (prefers-reduced-motion:reduce){.slp .cd.ps::before,.slp .cd.ps::after{animation:none!important;transition:none!important}}
