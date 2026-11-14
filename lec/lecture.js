@@ -1919,7 +1919,9 @@ function liOn(li){
 function applyPick(move, fx){
   const host = hostEl(); if(!host) return;
   host.querySelectorAll(".cd").forEach(function(el){
-    el.classList.toggle("pick", !!calPick && el.getAttribute("data-d") === calPick);
+    const on = !!calPick && el.getAttribute("data-d") === calPick;
+    el.classList.toggle("pick", on);
+    if(el.hasAttribute("aria-pressed")) el.setAttribute("aria-pressed", on ? "true" : "false");
   });
   host.querySelectorAll(".mlist li").forEach(function(li){
     const on = liOn(li);
@@ -2007,7 +2009,7 @@ function pickToTop(host, fx){
       const ga = gl.firstChild.animate([{transform:"translateX(-120%) skewX(-20deg)", opacity:0},{opacity:1, offset:.25},{opacity:1, offset:.7},{transform:"translateX(260%) skewX(-20deg)", opacity:0}],
                                        {id:"cal-fx", duration:720, delay:LIFT + MOVE - 60, easing:"cubic-bezier(.45,0,.25,1)", fill:"backwards"});
       ga.onfinish = function(){ gl.remove(); };
-      li.querySelectorAll(".dd,.nm .pdot,.nm .cdot,.nm .cstar,.nm .crown").forEach(function(e){
+      li.querySelectorAll(".dd,.nm .pdot,.nm .cdot,.nm .cstar,.nm .ptag").forEach(function(e){
         e.animate([{transform:"none"},{transform:"scale(1.12)", offset:.4},{transform:"none"}],
                   {id:"cal-fx", duration:380, delay:LIFT + MOVE - 40, easing:"cubic-bezier(.3,0,.2,1)"});
       });
@@ -2023,10 +2025,12 @@ function pickToTop(host, fx){
    대표 순서: 강의(일반 · 초청 · 유료 동급) → 컨설팅 → 멘토링 → 필싸 → 개인, 같은 종류는 시작 시각 빠른 순(모르면 뒤) → id → 회차.
    작은 기호는 최대 3개 — 4개를 넘으면(하루 5개 이상) 기호 2개 + '+N'. */
 const DAY_RANK = {lec:0, cs:1, mt:2, fs:3, ps:4};
+/* past = 그 회차 날짜가 오늘보다 앞(달력 표시 전용 — 모집 상태 status 계산과는 따로, 2026-11-14 속성 규칙) */
 function dayItems(k){
-  const a = (IDX[k] || []).map(x => ({lec:x.lec, ses:x.ses, t:startTime(x.lec, x.ses) || "",
+  const past = k < ymd(TODAY);
+  const a = (IDX[k] || []).map(x => ({lec:x.lec, ses:x.ses, t:startTime(x.lec, x.ses) || "", past:past,
     kind: x.lec.kind === "consult" ? (x.lec.mentor ? "mt" : "cs") : "lec"}));
-  (PDAYS[k] || []).forEach(p => a.push({ps:p, t:"", kind: p.kind === "feelssa" ? "fs" : "ps"}));
+  (PDAYS[k] || []).forEach(p => a.push({ps:p, t:"", past:past, kind: p.kind === "feelssa" ? "fs" : "ps"}));
   const id = x => String(x.lec ? x.lec.id : x.ps.id), n = x => (x.ses && +x.ses.n) || 0;
   return a.sort((x,y) => (DAY_RANK[x.kind] - DAY_RANK[y.kind]) || ((x.t ? 0 : 1) - (y.t ? 0 : 1))
     || (x.t < y.t ? -1 : x.t > y.t ? 1 : 0) || id(x).localeCompare(id(y)) || (n(x) - n(y)));
@@ -2038,18 +2042,19 @@ function dayLabel(k, items){
     if(x.ps) return PKIND[x.ps.kind].name;
     const t = x.t ? (+x.t.slice(0,2))+"시"+(x.t.slice(3) !== "00" ? " "+(+x.t.slice(3))+"분" : "")+" " : "";
     const w = x.kind === "cs" ? "컨설팅" : x.kind === "mt" ? "멘토링" : x.lec.kind === "invite" ? "초청 강의" : x.lec.paid ? "유료 강의" : "강의";
-    return t + x.lec.title + (x.lec.title.indexOf(w) >= 0 ? "" : " " + w);   /* "리셋하우스 2차 컨설팅 컨설팅" 처럼 겹치지 않게 */
+    return t + x.lec.title + (x.lec.title.indexOf(w) >= 0 ? "" : " " + w)   /* "리셋하우스 2차 컨설팅 컨설팅" 처럼 겹치지 않게 */
+      + (x.lec.paid && w !== "유료 강의" ? " (유료)" : "") + (x.past ? " (지난 일정)" : "");
   }).join(", ") + ".";
 }
 function dayMark(x){
   if(x.ps) return '<i class="cal-mark m-'+x.kind+'"></i>';
-  return '<i class="cal-mark m-'+x.kind+' d-'+x.lec.status+(x.lec.kind === "invite" ? " iv" : "")+(x.lec.paid ? " pd" : "")+'">'
+  return '<i class="cal-mark m-'+x.kind+' d-'+(x.past ? "done" : "fut")+(x.lec.kind === "invite" ? " iv" : "")+(x.lec.paid ? " pd" : "")+'">'
     + (x.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>';
 }
 function dayMarks(rest){
   if(!rest.length) return "";
   const show = rest.length > 3 ? rest.slice(0, 2) : rest;
-  return '<span class="cal-marks" aria-hidden="true">' + show.map(dayMark).join("")
+  return '<span class="cal-marks'+(rest.length === 1 ? " solo" : "")+'" aria-hidden="true">' + show.map(dayMark).join("")
     + (rest.length > 3 ? '<i class="cal-more">+'+(rest.length - 2)+'</i>' : '') + '</span>';
 }
 /* 개인 · 필싸 일정 원 크기 — 칸 실제 폭(소수 px)에서 정한다.
@@ -2076,8 +2081,8 @@ function renderSched(dir){
   const up = LECTURES.filter(l => l.status !== "done" && !l.kind)
     .sort((a,b)=> a.sessions[0].date < b.sessions[0].date ? -1 : 1)[0];
   q("#schSub").innerHTML = up
-    ? '색이 찍힌 날이 강의일입니다. <br class="m">다음 개강은 <b>' + fmtw(up.sessions[0].date) + '</b>입니다.'
-    : '색이 찍힌 날이 강의일입니다. <br class="m">다음 일정이 정해지면 여기에 올라갑니다.';
+    ? '모양이 표시된 날에 일정이 있습니다. <br class="m">다음 개강은 <b>' + fmtw(up.sessions[0].date) + '</b>입니다.'
+    : '모양이 표시된 날에 일정이 있습니다. <br class="m">다음 일정이 정해지면 여기에 올라갑니다.';
 
   const [y, mo] = MONTHS[calCur].split("-").map(Number);
   q("#calTitle").innerHTML = '<span>'+y+'년</span>'+mo+'월';
@@ -2118,33 +2123,32 @@ function renderSched(dir){
     const wk = dow===0 ? " sun" : dow===6 ? " sat" : "";
     const td = (k === ymd(TODAY)) ? " today" : "";
     const pk = (k === calPick) ? " pick" : "";
-    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1">'+d+'</button>'; continue; }
-    /* 강의일은 테두리 없는 둥근 사각형으로 채운다. 상태가 곧 색이고, 초청 강의는 그 위에 금색 점을 하나 더 단다.
-       컨설팅은 네모 대신 별, 멘토링(mentor:true)은 초록 동그라미. 색 규칙(앞으로 진초록, 지난 것 민트)은 같다.
-       개인 · 필싸 일정은 동그라미, 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
-    const c = capK(k), L = main.lec;
+    const cur = td ? ' aria-current="date"' : '';
+    if(!main){ h += '<button class="cd'+wk+td+'" tabindex="-1"'+cur+'>'+d+'</button>'; continue; }
+    /* 모양 = 종류, 채움 = 속성(2026-11-14 대표님 확정, GPT 솔 검토안): 강의 네모 · 컨설팅 별 · 멘토링 원 · 개인 · 필싸 코랄 · 겨자 원.
+       일반 강의 진초록 채움, 초청 흰 바탕 + 진초록 2px 테두리, 유료 금색 채움(금색은 유료에만). 지난 날(회차 날짜 기준)은 민트.
+       오늘 = 숫자 밑줄, 고른 날 = 칸 네 귀퉁이 꺾쇠(.cal-pk). 개인 · 필싸는 같은 주 안에서 이어진 날은 첫 칸이 캡슐을 그린다(psSeg). */
+    const c = capK(k), L = main.lec, ds = main.past ? "done" : "fut";
     /* 캡슐 칸: 기간 일정이 그 날을 지나가면 대표가 강의여도 캡슐은 잇는다(대표 모양은 원판 크기로 캡슐 안에, .pmx).
        하루짜리(줄 길이 1) 기간 일정이 대표가 아니면 캡슐 없이 작은 기호로만. */
     const inCap = !!c && (!!main.ps || psSeg[k] !== 1);
     const sub = multi ? dayMarks(items.slice(1)) : "";
-    const lab = multi ? dayLabel(k, items) : main.ps ? d+"일 "+PKIND[main.ps.kind].name : d+"일 "+L.title;
+    const lab = dayLabel(k, items) + (td ? " 오늘." : "");
     let cls, body;
     if(inCap){
       cls = " ps" + PKIND[c].cls + (psSeg[k] === 1 ? " one" : psSeg[k] > 1 ? " cap" : "") + (psEnd[k] ? " capend" : "")
-          + (main.ps ? "" : " pmx d-" + L.status + (L.paid ? " pdm" : ""));
-      body = main.ps ? d : '<i class="cal-main m-'+main.kind+' d-'+L.status+(L.kind === "invite" ? " iv" : "")+(L.paid ? " pd" : "")+'" aria-hidden="true">'
+          + (main.ps ? "" : " pmx d-" + ds + (L.paid ? " pdm" : "") + (L.kind === "invite" ? " ivm" : ""));
+      body = main.ps ? d : '<i class="cal-main m-'+main.kind+' d-'+ds+(L.kind === "invite" ? " iv" : "")+(L.paid ? " pd" : "")+'" aria-hidden="true">'
           + (main.kind === "cs" ? '<svg viewBox="0 0 100 100"><path d="'+STAR_D+'"/></svg>' : '') + '</i>' + d;
     } else {
       const cs = main.kind === "cs", mt = main.kind === "mt";
-      cls = " has d-" + L.status + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
+      cls = " has d-" + ds + (L.kind === "invite" ? " iv" : "") + (L.paid ? " pd" : "") + (cs ? " cs" : "") + (mt ? " mt" : "");
       body = (cs ? '<svg class="cst" viewBox="0 0 100 100" aria-hidden="true"><path d="'+STAR_D+'"/></svg><span class="csn">'+d+'</span>' : d)
-        + (L.paid && L.status !== "done"
-            ? '<i class="pdshn" aria-hidden="true"></i>' + (multi ? '' : '<i class="pdx" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></i>')
-            : '');
+        + (L.paid && !main.past ? '<i class="pdshn" aria-hidden="true"></i>' : '');   /* 유료 광택은 모양 안에서만(왕관 · 입자 · 바깥 빛 없앰) */
     }
     h += '<button class="cd'+cls+(multi ? " multi" : "")+wk+td+pk+'"'
        + (inCap && psSeg[k] > 1 ? ' style="--n:'+psSeg[k]+'"' : '')
-       + ' data-d="'+k+'" aria-label="'+esc(lab)+'">' + body + sub + '</button>';
+       + ' data-d="'+k+'" aria-pressed="'+(pk ? "true" : "false")+'"'+cur+' aria-label="'+esc(lab)+'">' + body + sub + '<i class="cal-pk" aria-hidden="true"></i></button>';
   }
   const grid = q("#calGrid");
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
@@ -2203,7 +2207,7 @@ function renderSched(dir){
         const ed = x.lec.edition ? ' ' + esc(x.lec.edition) : "";
         return '<li data-k="'+k+'" data-open="'+x.lec.id+'" role="button" tabindex="0">'
             + '<span class="dd">'+dt.getDate()+'일<em>('+WD[dt.getDay()]+')'+(function(t){ return t ? ' <b style="font-weight:700;font-size:12px">'+t+'</b>' : ""; })(startTime(x.lec, x.ses))+'</em></span>'
-            + '<span class="bd"><span class="nm">'+(x.lec.paid ? '<i class="crown" aria-label="유료 강의"></i>' : '')+(x.lec.kind === "consult" ? (x.lec.mentor ? '<i class="cdot" aria-label="멘토링"></i>' : '<i class="cstar" aria-label="컨설팅"></i>') : '')+esc(x.lec.title)+ed
+            + '<span class="bd"><span class="nm">'+(x.lec.paid ? '<span class="ptag">유료</span>' : '')+(x.lec.kind === "consult" ? (x.lec.mentor ? '<i class="cdot" aria-label="멘토링"></i>' : '<i class="cstar" aria-label="컨설팅"></i>') : '')+esc(x.lec.title)+ed
             + (x.lec.sessions.length > 1 ? '<i>'+x.ses.n+'회차</i>' : "") + '</span>'
             + '<span class="tt">'+esc(x.ses.title)+'</span></span>'
             + '<span class="st '+stOf(x.lec).cls+'">'+stOf(x.lec).label+'</span></li>';

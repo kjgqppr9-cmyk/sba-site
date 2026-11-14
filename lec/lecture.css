@@ -313,63 +313,27 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.sun{color:var(--sun)}
 .slp .cd.sat{color:var(--sat)}
 .slp .cd.pad{visibility:hidden}
-/* 앞으로 있을 강의는 전부 진초록 — '모집완료'는 모집이 끝났을 뿐 아직 안 한 강의다.
-   지난 강의(done)만 민트로 물러난다. */
+/* ══ 모양 = 종류, 채움 = 속성 (2026-11-14 대표님 확정, GPT 솔 검토 a3) ══
+   강의 네모 · 컨설팅 별 · 멘토링 원 · 개인 · 필싸 원. 일반 강의 진초록 채움 / 초청 흰 바탕 + 진초록 2px 테두리 + 초록 숫자 /
+   유료 금색 채움 + 진초록 숫자(금색은 유료에만 — 왕관 · 금점 · 입자 · 바깥 빛 없앰, 광택은 모양 안에서만).
+   지난 날(.d-done, 회차 날짜 기준 — lecture.js dayItems)은 민트 채움 + 1px #5E8B78 윤곽, 지난 초청은 흰 바탕 + 2px #5E8B78.
+   앞으로(.d-fut)는 모집 상태와 무관하게 같은 색(진행 중 금색 없앰). */
 .slp .cd.has{cursor:pointer;font-weight:800}
-.slp .cd.has.d-open,.slp .cd.has.d-upcoming,
-.slp .cd.has.d-invite,.slp .cd.has.d-closed{background:var(--green);color:#fff}
-.slp .cd.has.d-running{background:var(--gold);color:#3A2A06}
-.slp .cd.has.d-done{background:var(--mint);color:#1F5140}
-.slp .cd.has.iv::after{content:"";position:absolute;top:5px;right:5px;
-  width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #fff}
-/* 유료 강의는 칸 오른쪽 위에 작은 금색 왕관을 단다 (paid:true). 그림은 --crown 에 한 번만 심는다. */
-.slp{--crown:url("data:image/png;base64,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")}
-.slp .cd.has.pd::before{content:"";position:absolute;top:2px;right:2px;width:16px;height:12px;
-  background:var(--crown) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))}
-.slp .mlist .nm .crown{display:inline-block;width:15px;height:11px;vertical-align:-1px;margin-right:6px;
-  background:var(--crown) center/contain no-repeat}
-/* ══ 유료 강의 칸 (2026-09-17 대표님): 금빛 바탕 + 금빛 테두리 광채 + 초록 왕관 + 반짝 줄기 + 톡 튀는 입자.
-   가볍게: 움직임은 전부 transform · opacity 만 쓴다(합성 단계에서 처리, 다시 그리기 없음). 지난 강의(done)는 제외. */
-.slp .cd.has.pd:not(.d-done){background:linear-gradient(155deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,0) 50%,rgba(140,95,20,.12) 100%),url("gold-leaf.jpg") center/cover,#E2B83C;color:#0B3D2A;text-shadow:2px 0 0 #fff,-2px 0 0 #fff,0 2px 0 #fff,0 -2px 0 #fff,1.5px 1.5px 0 #fff,-1.5px 1.5px 0 #fff,1.5px -1.5px 0 #fff,-1.5px -1.5px 0 #fff,0 2px 6px rgba(120,86,20,.35);
-  box-shadow:0 0 0 2px #F6E3A6,0 6px 16px rgba(185,138,46,.38);z-index:1}
-.slp .cd.has.pd:not(.d-done)::after{content:"";position:absolute;inset:-3px;border-radius:17px;pointer-events:none;
-  box-shadow:0 0 0 2px rgba(246,227,166,.95),0 0 18px 4px rgba(233,197,106,.75);opacity:.25;
-  animation:pdGlow 2.4s ease-in-out infinite}
-@keyframes pdGlow{0%,100%{opacity:.25}50%{opacity:1}}
-/* 왕관은 초록으로: 같은 그림을 모양(마스크)으로만 쓰고 색은 초록을 채운다 */
-.slp .cd.has.pd::before{background:#006241!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.55))!important;
-  -webkit-mask:var(--crown) center/contain no-repeat;mask:var(--crown) center/contain no-repeat}
-.slp .cd.has.pd.d-done::before{background:#3F7A62!important;filter:none!important}
+.slp .cd.has.d-fut{background:var(--green);color:#fff}
+.slp .cd.has.d-done{background:var(--mint);color:#1F5140;box-shadow:inset 0 0 0 1px #5E8B78}
+.slp .cd.has.iv.d-fut{background:#fff;color:var(--green);box-shadow:inset 0 0 0 2px var(--green)}
+.slp .cd.has.iv.d-done{background:#fff;color:#1F5140;box-shadow:inset 0 0 0 2px #5E8B78}
+.slp .cd.has.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258);color:#0B3D2A;text-shadow:none}
+/* 유료 광택 — 모양 안(.pdshn, overflow:hidden)에서 낮은 세기로 한 번씩 지나간다 */
 .slp .pdshn{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
 .slp .pdshn::before{content:"";position:absolute;top:-20%;bottom:-20%;left:0;width:45%;
-  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.85) 50%,transparent 100%);
+  background:linear-gradient(100deg,transparent 0%,rgba(255,255,255,.42) 50%,transparent 100%);
   transform:translateX(-160%) skewX(-18deg);animation:pdShine 3.4s cubic-bezier(.4,0,.2,1) infinite}
 @keyframes pdShine{0%,55%{transform:translateX(-160%) skewX(-18deg)}85%,100%{transform:translateX(330%) skewX(-18deg)}}
-.slp .pdx{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
-.slp .pdx i{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:50%;
-  background:radial-gradient(circle,#FFFDF2 0 35%,#F2CF72 60%,rgba(242,207,114,0) 72%);
-  opacity:0;transform:translate(0,0) scale(.2);animation:pdPop 2.6s cubic-bezier(.2,.7,.3,1) infinite}
-.slp .pdx i:nth-child(1){--x:-30px;--y:-26px;animation-delay:.05s}
-.slp .pdx i:nth-child(2){--x:32px;--y:-22px;animation-delay:.12s;width:5px;height:5px}
-.slp .pdx i:nth-child(3){--x:-34px;--y:12px;animation-delay:.2s}
-.slp .pdx i:nth-child(4){--x:30px;--y:22px;animation-delay:.08s;width:4px;height:4px}
-.slp .pdx i:nth-child(5){--x:2px;--y:-38px;animation-delay:.16s}
-.slp .pdx i:nth-child(6){--x:-8px;--y:36px;animation-delay:.24s;width:5px;height:5px}
-.slp .pdx i:nth-child(7){--x:40px;--y:-2px;animation-delay:.3s;width:4px;height:4px}
-@keyframes pdPop{0%{opacity:0;transform:translate(0,0) scale(.2)}
-  12%{opacity:1;transform:translate(calc(var(--x)*.45),calc(var(--y)*.45)) scale(1.25)}
-  45%{opacity:0;transform:translate(var(--x),var(--y)) scale(.4)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.4)}}
-.slp .cd.has.pd:not(.d-done):hover .pdx i{animation-duration:1.2s}
-.slp .cd.has.pd:not(.d-done):hover{transform:scale(1.14)}
-.slp .cd.has.pd:not(.d-done):hover .pdshn::before{animation-duration:1.4s}
-.slp .cd.has.pd:not(.d-done):hover::after{animation-duration:1.1s}
-.slp .calfoot em.pd{background:url("gold-leaf.jpg") center/cover,#E2B83C!important;box-shadow:0 0 0 1.5px #F6E3A6,0 0 8px rgba(233,197,106,.7)}
-.slp .calfoot em.pd::after{background:#006241!important;filter:none!important;
-  -webkit-mask:var(--crown) center/contain no-repeat;mask:var(--crown) center/contain no-repeat}
-.slp .mlist .nm .crown{width:32px!important;height:23px!important;vertical-align:-6px!important;margin-right:8px!important;background:url("crown-cute.webp") center/contain no-repeat!important;filter:drop-shadow(0 1px 2px rgba(120,80,10,.3))}
-@media (prefers-reduced-motion:reduce){.slp .cd.has.pd::after,.slp .pdshn::before,.slp .pdx i{animation:none!important}.slp .pdx{display:none}}
+.slp .cd.has.pd.d-fut:hover .pdshn::before{animation-duration:1.4s}
+@media (prefers-reduced-motion:reduce){.slp .pdshn::before{animation:none!important}}
 /* ══ 컨설팅 칸 (2026-09-28 대표님): 네모는 강의, 별은 컨설팅.
-   색은 다른 칸과 같은 규칙(앞으로 = 진초록, 지난 것 = 민트)이고 모양만 별이다.
+   색은 다른 칸과 같은 규칙(앞으로 = 진초록, 지난 것 = 민트)이고 모양만 별이다. 금선은 없앴다(2026-11-14, 금색은 유료에만).
    가운데 맞춤: 숫자는 옆 칸 숫자와 같은 자리(칸 가운데)에 그대로 두고, 별의 몸통 중심을 숫자 글자 한가운데에 맞춘다.
    숫자 글자(획)의 가운데는 줄 상자 가운데보다 .05em 위다(Pretendard 800 실측) — 그만큼 별도 올린다.
    흔들기(회전)는 별이 기울어 숫자가 한쪽으로 쏠려 보여서 뺐다(대표님). 대신 제자리에서 숨 쉬듯 커졌다 작아진다. */
@@ -378,48 +342,46 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 /* 크기: 처음 116% → 대표님 '조금 커 보인다, 10%만' 으로 104.4%(2026-09-28). 가운데를 지키려고 left/top 은 (100-크기)/2. */
 .slp .cd.cs .cst{position:absolute;left:-2.2%;top:calc(-2.2% - .05em);width:104.4%;height:104.4%;max-width:none;max-height:none;overflow:visible;pointer-events:none;
   transform-origin:50% 50%;animation:csBreath 3.2s ease-in-out infinite}
-.slp .cd.cs .cst path{fill:var(--green);stroke:var(--gold);stroke-width:7;stroke-linejoin:round;paint-order:stroke;
-  transition:fill .22s var(--ease),stroke .22s var(--ease)}
+.slp .cd.cs .cst path{fill:var(--green);stroke:none;stroke-linejoin:round;paint-order:stroke;transition:fill .22s var(--ease)}
 .slp .cd.cs .csn{position:relative;z-index:1}
 @keyframes csBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 .slp .cd.has.cs.d-done{background:transparent;color:#1F5140}
 .slp .cd.cs.d-done .cst{animation:none}
-.slp .cd.cs.d-done .cst path{fill:var(--mint);stroke:#BBD8CB}
+.slp .cd.cs.d-done .cst path{fill:var(--mint);stroke:#5E8B78;stroke-width:3}
 .slp .cd.has.cs:hover{transform:scale(1.12)}
 .slp .cd.has.cs:hover .cst{animation-duration:1.4s}
-.slp .cd.cs.today{box-shadow:none}
-.slp .cd.cs.today .cst path{stroke-width:13}
-.slp .cd.cs.pick,.slp .cd.cs.pick.today{outline:none;box-shadow:none}
-.slp .cd.cs.pick .cst{filter:drop-shadow(0 5px 8px rgba(0,0,0,.24))}
-.slp .cd.cs.pick .cst path{stroke:var(--house)}
 .slp .calfoot em.cs{width:18px;height:18px;border-radius:0;background:none}
 .slp .calfoot em.cs svg{display:block;width:100%;height:100%;overflow:visible}
-.slp .calfoot em.cs path{fill:var(--green);stroke:var(--gold);stroke-width:9;stroke-linejoin:round;paint-order:stroke}
-.slp .mlist .nm .cstar{display:inline-block;width:15px;height:15px;vertical-align:-2px;margin-right:6px;background:var(--gold);
+.slp .calfoot em.cs path{fill:var(--green)}
+.slp .mlist .nm .cstar{display:inline-block;width:15px;height:15px;vertical-align:-2px;margin-right:6px;background:var(--green);
   -webkit-mask:var(--star) center/contain no-repeat;mask:var(--star) center/contain no-repeat}
 .slp .lc.b-consult{border-left-color:var(--gold)}
 @media (prefers-reduced-motion:reduce){.slp .cd.cs .cst{animation:none}}
 .slp .cd.has:hover{transform:scale(1.08)}
 .slp .cd.has:active{transform:scale(.97)}
 .slp .cd.has:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.slp .cd.today{box-shadow:inset 0 0 0 2px var(--gold)}
-/* 고른 날은 색을 바꾸지 않는다 — 색을 갈아 끼우면 깜빡이는 것처럼 보인다. */
-.slp .cd.pick{outline:3px solid var(--house);outline-offset:2px;
-  transform:scale(1.06);z-index:1;box-shadow:0 6px 16px rgba(0,0,0,.16)}
-.slp .cd.pick.today{box-shadow:inset 0 0 0 2px var(--gold),0 6px 16px rgba(0,0,0,.16)}
+/* 오늘 = 숫자 밑줄(테두리 네모 없음). 고른 날 = 칸 네 귀퉁이 꺾쇠(.cal-pk, 칸 상자 inset:0 기준, 두께 2 · 길이 6px).
+   확대 · 테두리 · 그림자 없음 — 원 · 별 · 캡슐 · 초청 위에서도 귀퉁이는 비어 있어 꺾쇠가 보인다. */
+.slp .cd.today{text-decoration:underline 2px currentColor;text-underline-offset:2px;text-decoration-skip-ink:none}
+.slp{--pkc:#1E3932;--pk:linear-gradient(var(--pkc),var(--pkc)) left top/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) left top/2px 6px no-repeat,
+  linear-gradient(var(--pkc),var(--pkc)) right top/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) right top/2px 6px no-repeat,
+  linear-gradient(var(--pkc),var(--pkc)) left bottom/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) left bottom/2px 6px no-repeat,
+  linear-gradient(var(--pkc),var(--pkc)) right bottom/6px 2px no-repeat,linear-gradient(var(--pkc),var(--pkc)) right bottom/2px 6px no-repeat}
+.slp .cd .cal-pk{position:absolute;inset:0;z-index:4;pointer-events:none;font-style:normal;background:var(--pk);opacity:0;transition:opacity .18s var(--ease)}
+.slp .cd.pick .cal-pk{opacity:1}
 
 .slp .calfoot{display:flex;flex-wrap:wrap;gap:8px 16px;padding:2px 18px 18px;
   font-size:12.5px;color:var(--ink2)}
 .slp .calfoot span{display:inline-flex;align-items:center;gap:6px}
 .slp .calfoot em{width:16px;height:16px;border-radius:6px;display:inline-block;font-style:normal;
   position:relative;flex:none}
-.slp .calfoot em.td{background:transparent;box-shadow:inset 0 0 0 2px var(--gold)}
-.slp .calfoot em.iv{background:var(--green)}
-.slp .calfoot em.iv::after{content:"";position:absolute;top:-2px;right:-2px;
-  width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #fff}
-.slp .calfoot em.pd{background:var(--green)}
-.slp .calfoot em.pd::after{content:"";position:absolute;top:-5px;right:-5px;width:14px;height:10px;
-  background:var(--crown) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.28))}
+.slp .calfoot em.lg{background:var(--green)}
+.slp .calfoot em.lg.iv{background:#fff;box-shadow:inset 0 0 0 2px var(--green)}
+.slp .calfoot em.lg.pd{background:linear-gradient(145deg,#E8C97E,#CBA258)}
+.slp .calfoot em.lg.dn{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
+.slp .calfoot em.td{width:auto;height:auto;border-radius:0;background:none;padding:0 2px;font-size:12.5px;font-weight:800;line-height:1.2;color:var(--house);
+  text-decoration:underline 2px currentColor;text-underline-offset:2px;text-decoration-skip-ink:none}
+.slp .calfoot em.pk{border-radius:0;background:var(--pk)}
 
 /* 그 달의 일정은 누르지 않아도 항상 보인다 */
 .slp .mlist{border-top:1.5px solid var(--line);background:#FCFBF9;padding:18px 20px 20px}
@@ -437,6 +399,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist .bd{min-width:0}
 .slp .mlist .nm{display:block;font-size:15px;font-weight:800;color:var(--house);line-height:1.4}
 .slp .mlist .nm i{font-style:normal;color:var(--gold);font-size:13px;margin-left:6px}
+.slp .mlist .nm .ptag{display:inline-block;margin-right:6px;padding:1px 7px;border-radius:6px;vertical-align:1px;font-size:12px;font-weight:800;line-height:1.5;color:#0B3D2A;background:linear-gradient(145deg,#E8C97E,#CBA258)}
 .slp .mlist .tt{display:block;margin-top:3px;font-size:14px;color:var(--ink2);line-height:1.5}
 .slp .mlist .none{font-size:14.5px;color:var(--ink2);background:#fff;border:1.5px dashed var(--line);
   border-radius:12px;padding:18px;text-align:center}
@@ -448,7 +411,6 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   /* 좁은 화면에서는 칸 폭이 40px 아래로 내려간다. 정사각형을 고집하면
      손가락으로 누르기 힘들어지므로, 높이만 44px 로 받쳐 둔다. */
   .slp .cd{min-height:44px;font-size:15.5px;border-radius:12px}
-  .slp .cd.has.iv::after{width:7px;height:7px;top:4px;right:4px}
   .slp .calgrid i.wd{font-size:12.5px}
   .slp .caltop{padding:13px 12px}
   .slp .caltop h3{font-size:18px}
@@ -601,8 +563,9 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 @media (prefers-reduced-motion:reduce){.slp .cc .ccm{animation:none}}
 
 /* ══ 멘토링 칸 (2026-10-01 대표님): 컨설팅은 별, 멘토링은 초록 동그라미. 색 규칙은 같다(앞으로 진초록, 지난 것 민트). */
-.slp .cd.has.mt{border-radius:50%;background:var(--green);color:#fff}
-.slp .cd.has.mt.d-done{border-radius:50%;background:var(--mint);color:#1F5140}
+.slp .cd.has.mt{border-radius:50%}
+.slp .cd.has.mt.d-fut{background:var(--green);color:#fff}
+.slp .cd.has.mt.d-done{background:var(--mint);color:#1F5140}
 .slp .calfoot em.mt{border-radius:50%;background:var(--green)}
 .slp .mlist .nm .cdot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:6px;background:var(--green)}
 .slp .st-mentor{background:#fff;color:var(--house);border:1.5px solid var(--green)}
@@ -678,9 +641,7 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calgrid.psgo .cd.ps.one::before{animation:psRing .75s .2s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes psRing{from{box-shadow:0 0 0 0 var(--pl),0 0 0 0 var(--pc)}}
 @keyframes psUnroll{from{transform:scaleX(.2);opacity:0}to{transform:none;opacity:1}}
-/* 고른 개인 · 필싸 날 — 네모 테두리 대신 원판만 살짝 커진다(캡슐은 그대로) */
-.slp .cd.ps.pick,.slp .cd.ps.pick.today{outline:none;box-shadow:none;transform:none}
-.slp .cd.ps.pick::before{transform:scale(1.1)}
+/* 고른 개인 · 필싸 날도 꺾쇠만(.cal-pk) — 원판 확대 없음(2026-11-14 A-1) */
 .slp .cd.ps:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .slp .calfoot em.ps{border-radius:50%;background:#D97757}
 .slp .calfoot em.ps.fs{background:#AD7F0A}
@@ -701,43 +662,43 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd .cal-marks{position:absolute;left:50%;bottom:3px;transform:translateX(-50%);display:flex;align-items:center;gap:3px;
   height:12px;min-width:16px;justify-content:center;box-sizing:border-box;padding:0 3px;background:#fff;border-radius:99px;box-shadow:0 0 0 1px rgba(30,57,50,.10),0 1px 2px rgba(0,0,0,.08);
   z-index:2;pointer-events:none;line-height:1}
-.slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;border-radius:2px;background:var(--green);font-style:normal}
-.slp .cd .cal-mark.d-done{background:#A9C7B8}
-.slp .cd .cal-mark.d-running{background:var(--gold)}
-.slp .cd .cal-mark.pd:not(.d-done){background:url("gold-leaf.jpg") center/cover,#E2B83C;box-shadow:inset 0 0 0 1px rgba(140,95,20,.35)}
-.slp .cd .cal-mark.iv::after{content:"";position:absolute;top:-2px;right:-2px;width:4px;height:4px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 1px #fff}
+.slp .cd .cal-mark{position:relative;flex:0 0 8px;width:8px;height:8px;box-sizing:border-box;border-radius:2px;background:var(--green);font-style:normal}
+.slp .cd .cal-mark.d-done{background:#5E8B78}
+.slp .cd .cal-mark.iv{background:#fff;border:2px solid var(--green);border-radius:1px}
+.slp .cd .cal-mark.iv.d-done{background:#fff;border-color:#5E8B78}
+.slp .cd .cal-mark.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258);box-shadow:inset 0 0 0 1px #8A6512}
 .slp .cd .cal-mark.m-mt,.slp .cd .cal-mark.m-ps,.slp .cd .cal-mark.m-fs{border-radius:50%}
 .slp .cd .cal-mark.m-ps{background:#D97757}
 .slp .cd .cal-mark.m-fs{background:#AD7F0A}
 .slp .cd .cal-mark.m-cs{background:none;flex-basis:9px;width:9px;height:9px}
 .slp .cd .cal-mark svg{display:block;width:100%;height:100%;max-width:none;overflow:visible}
-.slp .cd .cal-mark svg path{fill:var(--green);stroke:var(--gold);stroke-width:9;stroke-linejoin:round;paint-order:stroke}
-.slp .cd .cal-mark.m-cs.d-done svg path{fill:#A9C7B8;stroke:#BBD8CB}
+.slp .cd .cal-mark svg path{fill:var(--green);stroke:none}
+.slp .cd .cal-mark.m-cs.d-done svg path{fill:#5E8B78}
 .slp .cd .cal-more{font-style:normal;font-size:9px;font-weight:800;color:var(--house);letter-spacing:-.02em;line-height:1}
-/* 캡슐 안 대표 강의(.pmx) */
+/* 기호가 하나뿐인 날 — 흰 알약이 기호를 감싸 'O'(고리)처럼 읽히지 않게 납작한 직사각 받침으로(a3 4번) */
+.slp .cd .cal-marks.solo{min-width:22px;height:12px;padding:2px 7px;border-radius:3px;background:#fff;box-shadow:none}
+.slp .cd .cal-marks.solo .m-mt{width:8px;height:8px;flex:0 0 8px;border:0;border-radius:50%}
+/* 캡슐 안 대표 강의(.pmx) — 같은 속성 규칙을 원판 크기(--psc) 모양에 */
 .slp .cd.ps.pmx::before{display:none}
 .slp .cd.ps.pmx.d-done{color:#1F5140}
-.slp .cd.ps.pmx.d-running{color:#3A2A06}
-.slp .cd.ps.pmx.pdm:not(.d-done){color:#0B3D2A}
+.slp .cd.ps.pmx.ivm.d-fut{color:var(--green)}
+.slp .cd.ps.pmx.pdm.d-fut{color:#0B3D2A}
 .slp .cd .cal-main{position:absolute;z-index:-1;left:50%;top:50%;width:var(--psc);height:var(--psc);margin:calc(var(--psc) / -2) 0 0 calc(var(--psc) / -2);
-  border-radius:11px;background:var(--green);pointer-events:none;font-style:normal;transition:transform .3s var(--pop)}
-.slp .cd .cal-main.d-done{background:var(--mint)}
-.slp .cd .cal-main.d-running{background:var(--gold)}
-.slp .cd .cal-main.pd:not(.d-done){background:url("gold-leaf.jpg") center/cover,#E2B83C;box-shadow:0 0 0 2px #F6E3A6}
+  border-radius:11px;background:var(--green);pointer-events:none;font-style:normal}
+.slp .cd .cal-main.d-done{background:var(--mint);box-shadow:inset 0 0 0 1px #5E8B78}
+.slp .cd .cal-main.iv.d-fut{background:#fff;box-shadow:inset 0 0 0 2px var(--green)}
+.slp .cd .cal-main.iv.d-done{background:#fff;box-shadow:inset 0 0 0 2px #5E8B78}
+.slp .cd .cal-main.pd.d-fut{background:linear-gradient(145deg,#E8C97E,#CBA258)}
 .slp .cd .cal-main.m-mt{border-radius:50%}
-.slp .cd .cal-main.m-cs{background:none;border-radius:0}
+.slp .cd .cal-main.m-cs{background:none;border-radius:0;box-shadow:none}
 .slp .cd .cal-main svg{display:block;width:100%;height:100%;max-width:none;max-height:none;overflow:visible}
-.slp .cd .cal-main svg path{fill:var(--green);stroke:var(--gold);stroke-width:7;stroke-linejoin:round;paint-order:stroke}
-.slp .cd .cal-main.m-cs.d-done svg path{fill:var(--mint);stroke:#BBD8CB}
-.slp .cd .cal-main.iv::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px #fff}
-.slp .cd.ps.pmx.pick .cal-main{transform:scale(1.1)}
+.slp .cd .cal-main svg path{fill:var(--green);stroke:none;stroke-linejoin:round;paint-order:stroke}
+.slp .cd .cal-main.m-cs.d-done svg path{fill:var(--mint);stroke:#5E8B78;stroke-width:3}
 /* 범례 안내 한 줄 */
 .slp .calfoot .mxnote{flex-basis:100%;color:var(--ink2);font-size:12px}
-.slp .calfoot em.mx{background:var(--green)}
-.slp .calfoot em.mx::after{content:"";position:absolute;left:50%;bottom:-4px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--green);box-shadow:0 0 0 2px #fff}
 @container (max-width:600px){
   .slp .cd .cal-marks{bottom:3px;height:11px;gap:2px;padding:0 2px}
-  .slp .cd .cal-main.iv::after{width:6px;height:6px;top:2px;right:2px}
+  .slp .cd .cal-marks.solo{height:12px;padding:2px 6px;min-width:20px}
 }
 
 /* ══ 날짜 고를 때 안무 (2026-11-14 대표님: '밋밋하다 · 화려하되 고급스럽게') — 움직임 값은 lecture.js pickToTop 주석.
@@ -752,5 +713,5 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .mlist li .fx-gl>i{position:absolute;top:-10%;bottom:-10%;left:0;width:42%;font-style:normal;opacity:0;
   background:linear-gradient(100deg,rgba(255,255,255,0) 0%,rgba(250,236,200,.55) 38%,rgba(255,250,235,.85) 50%,rgba(242,214,150,.5) 62%,rgba(255,255,255,0) 100%)}
 .slp .mlist .dd{transform-origin:left center}
-.slp .mlist .nm .pdot,.slp .mlist .nm .cdot,.slp .mlist .nm .cstar{transform-origin:center}
+.slp .mlist .nm .pdot,.slp .mlist .nm .cdot,.slp .mlist .nm .cstar,.slp .mlist .nm .ptag{transform-origin:center}
 @media (prefers-reduced-motion:reduce){.slp .cd .cal-ripple,.slp .mlist li .fx-sh,.slp .mlist li .fx-gl{display:none}}
