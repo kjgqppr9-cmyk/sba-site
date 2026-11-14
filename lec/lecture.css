@@ -821,3 +821,23 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
   text-shadow:var(--k0);animation:tdBeat 3s ease-out infinite}
 @container (max-width:600px){.slp .cd.today .cal-pk{top:-3px;bottom:auto;width:22px;height:21px}}   /* 딱지가 없어져 모바일도 체크를 오른쪽 위로 */
 @media (prefers-reduced-motion:reduce){.slp .cd .tdn,.slp .calfoot em.td{animation:none;text-shadow:var(--k1)}}
+/* ══ 고른 날 = 이중 테두리의 틈을 주색보다 진하게(2026-11-15 s1115pk1 대표님). 체크(.cal-pk) 없앰.
+   강의 틈도 흰색 → 연초록(다른 칸처럼 같은 계열 연한 색). 테두리 없는 칸: 빈 날 · 필싸 = 진초록 이중원이 생김, 유료 = 금빛 칸 밖 진한 금갈색 테. ══ */
+.slp{--lgp:#CFE6DA}
+.slp .cd.has.d-fut:not(.iv):not(.pd):not(.cs):not(.ps){box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 var(--dg) var(--lgp)}
+.slp .calfoot em.lg:not(.iv):not(.pd):not(.dn),.slp .calfoot em.mt{box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 3px var(--lgp)}
+.slp .cd .cal-pk{display:none}
+/* 고른 날 — 틈을 진하게 */
+.slp .cd.has.pick.d-fut:not(.iv):not(.pd):not(.cs):not(.ps){box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 var(--dg) var(--house)}
+.slp .cd.has.pick.d-done:not(.iv):not(.pd):not(.cs):not(.ps){box-shadow:inset 0 0 0 1px #5E8B78,inset 0 0 0 var(--dg) #5E8B78}
+.slp .cd.has.iv.pick.d-fut:not(.ps){box-shadow:inset 0 0 0 1.5px #D2AC3A,inset 0 0 0 var(--dg) #B58E22}
+.slp .cd.has.iv.pick.d-done:not(.ps){box-shadow:inset 0 0 0 1px #C9B57A,inset 0 0 0 var(--dg) #C9B57A}
+.slp .cd.has.cs.pick.d-fut{box-shadow:inset 0 0 0 1.5px var(--csl),inset 0 0 0 var(--dg) #B58E22}
+.slp .cd.has.cs.pick.d-done{box-shadow:inset 0 0 0 1px #C9B57A,inset 0 0 0 var(--dg) #C9B57A}
+.slp .cd.has.pd.pick.d-fut{box-shadow:inset 0 0 0 1px rgba(138,101,18,.22),0 0 0 2px #fff,0 0 0 4.5px #8A6512}
+/* 개인(코랄) — 원판 둘레 틈을 진한 코랄로(캡슐 안 날이면 그 원판에 진한 고리) */
+.slp .cd.ps:not(.fs).pick::before{box-shadow:0 0 0 calc(var(--psg) - 1.5px) #A94F33,0 0 0 var(--psg) var(--pc)}
+/* 빈 날 · 필싸 — 진초록 이중원이 생김(필싸 몽땅이는 그 위에) */
+.slp .cd.pick:not(.has):not(.ps),.slp .cd.ps.fs.pick{border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 var(--dg) var(--house)}
+.slp .cd.pick:not(.has):not(.ps){color:var(--green)}
+.slp .calfoot em.pk{width:16px;height:16px;border-radius:4.8px;background:var(--green);box-shadow:inset 0 0 0 1.5px var(--green),inset 0 0 0 3px var(--house)}
