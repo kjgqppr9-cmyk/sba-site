@@ -861,3 +861,5 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .cd.has.mt.pick.d-done{--cg:#5E8B78}
 .slp .cd.has.cs.pick.d-fut{--cg:#B58E22}
 .slp .cd.has.cs.pick.d-done{--cg:#C9B57A}
+/* 2026-11-15 s1115lg1 대표님: 범례에서 「오늘」 · 「고른 날」 견본 삭제(로더 템플릿에서도 뺌 — 옛 블록이 남아 있어도 숨김) */
+.slp .calfoot span:has(> em.td),.slp .calfoot span:has(> em.pk){display:none}
