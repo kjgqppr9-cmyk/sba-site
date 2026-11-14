@@ -2101,6 +2101,19 @@ function dayMarks(rest){
    안쪽 = 짝수(50 · 32)라, 화면이 정수 픽셀로 맞출 때 두 원의 중심이 가로 · 세로로 0.5px 씩 엇갈렸다(2026-11-14 실측).
    하루짜리 테두리는 원판의 box-shadow 라 원판과 같은 상자 — 중심이 어긋날 수가 없다.
    캡슐도 원판과 같은 높이 · 위치의 상자에 같은 box-shadow 를 둘러 그린다. 원판 지름이 짝수여야 끝 칸 반원 조각과 중심이 맞는다. */
+/* 오늘 딱지 · 고른 날 체크를 기기 픽셀에 맞춘다(2026-11-14 s1114tp5 — 칸이 소수 px 자리라 반 픽셀에 걸려 흐려지던 것).
+   전부 되돌림 → 전부 재기 → 전부 옮기기 순서(레이아웃 한 번). CSS translate 속성이라 칸의 transform(눌림 · 확대)과 안 부딪친다. */
+function calSnap(grid){
+  const els = grid.querySelectorAll(".cal-td,.cal-pk");
+  if(!els.length) return;
+  const dp = window.devicePixelRatio || 1;
+  els.forEach(e => { e.style.translate = ""; });
+  const rs = Array.prototype.map.call(els, e => e.getBoundingClientRect());
+  els.forEach((e, i) => {
+    const dx = Math.round(rs[i].left * dp) / dp - rs[i].left, dy = Math.round(rs[i].top * dp) / dp - rs[i].top;
+    e.style.translate = (Math.abs(dx) < .001 && Math.abs(dy) < .001) ? "" : dx.toFixed(3) + "px " + dy.toFixed(3) + "px";
+  });
+}
 function psFit(grid){
   const c = grid.querySelector(".cd:not(.pad)");
   if(!c || !c.offsetWidth) return;
@@ -2114,6 +2127,7 @@ function psFit(grid){
   /* 둥근값 한 체계(2026-11-14 s1114tp4): 둥근 네모는 모두 '한 변 × 0.3'. 칸 = 칸 폭 × 0.3, 캡슐 안 대표 모양 = 원판 지름 × 0.3 (CSS 는 --cr · --crm) */
   grid.style.setProperty("--cr", (Math.round(w * .3 * 2) / 2) + "px");
   grid.style.setProperty("--crm", (Math.round(d * .3 * 2) / 2) + "px");
+  calSnap(grid);
   goldFit(w);
 }
 /* ── 유료 = 금빛 크레용 (2026-11-14 대표님 — HUSS 특강 덱 assets/fx/gold_crayon.js 의 질감을 달력 칸 크기로 줄인 것) ──
@@ -2325,6 +2339,14 @@ function renderSched(dir){
   grid.className = "calgrid" + (dir ? (dir > 0 ? " go-l" : " go-r") : "") + (grid.classList.contains("psgo") ? " psgo" : "");
   grid.innerHTML = h;
   psFit(grid);
+  /* 달 넘김(go-l · go-r) · 나타남(.rv) 같은 움직임이 끝나면 자리가 바뀌므로 딱지 · 체크를 다시 맞춘다 */
+  if(!grid.__snapEv){
+    grid.__snapEv = true;
+    const h0 = hostEl() || document;
+    const re = function(e){ if(e.target && e.target.contains && e.target.contains(grid)) calSnap(grid); };
+    h0.addEventListener("animationend", re); h0.addEventListener("transitionend", re);
+    window.addEventListener("load", function(){ calSnap(grid); });
+  }
   if(!grid.__psro){
     grid.__psro = true;
     if(window.ResizeObserver) new ResizeObserver(function(){ psFit(grid); }).observe(grid);
