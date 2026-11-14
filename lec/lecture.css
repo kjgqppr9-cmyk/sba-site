@@ -385,7 +385,6 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .calfoot em.cs path{fill:var(--green)}
 .slp .mlist .nm .cstar{display:inline-block;width:15px;height:15px;vertical-align:-2px;margin-right:6px;background:var(--green);
   -webkit-mask:var(--star) center/contain no-repeat;mask:var(--star) center/contain no-repeat}
-.slp .lc.b-consult{border-left-color:var(--gold)}
 @media (prefers-reduced-motion:reduce){.slp .cd.cs .cst{animation:none}}
 .slp .cd.has:hover{transform:scale(1.08)}
 .slp .cd.has:active{transform:scale(.97)}
@@ -476,18 +475,12 @@ section:has(.slp){overflow-x:hidden;overflow-x:clip}
 .slp .more:active{transform:scale(.97)}
 .slp .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:16px;margin-top:22px}
 .slp .lc{background:#fff;border-radius:16px;padding:22px 24px 20px;box-shadow:var(--sh);cursor:pointer;
-  border-left:5px solid transparent;text-align:left;font-family:inherit;border-top:none;
+  border-left:none;text-align:left;font-family:inherit;border-top:none;   /* 2026-11-16 왼쪽 색 띠 없앰(대표님) — 상태는 배지로 */
   border-right:none;border-bottom:none;width:100%;
   transition:transform .24s var(--pop),box-shadow .24s}
 .slp .lc:hover{transform:translateY(-5px);box-shadow:0 4px 10px rgba(0,0,0,.06),0 18px 38px rgba(0,0,0,.10)}
 .slp .lc:active{transform:translateY(-1px) scale(.995)}
 .slp .lc:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
-.slp .lc.b-open{border-left-color:var(--green)}
-.slp .lc.b-invite{border-left-color:var(--gold)}
-.slp .lc.b-upcoming{border-left-color:#DAD9D2}
-.slp .lc.b-closed{border-left-color:var(--navy)}
-.slp .lc.b-running{border-left-color:var(--gold)}
-.slp .lc.b-done{border-left-color:#A9C7B8}
 .slp .lc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:11px}
 .slp .lc h3{font-size:19.5px;font-weight:800;color:var(--house);line-height:1.35;letter-spacing:-.03em}
 .slp .lc .lc-sum{margin-top:8px;font-size:14px;color:var(--ink2);line-height:1.6;
