@@ -1397,7 +1397,7 @@ const LECTURES = [
      쓰는 법: {id, kind:"personal"|"feelssa", from:"YYYY-MM-DD", to:"YYYY-MM-DD"} (하루면 to 생략) */
   {id:"feelssa-1106", kind:"feelssa", from:"2026-11-06"},   /* 11/15 대표님: 개인 → 필싸 */
   {id:"personal-1113", kind:"personal", from:"2026-11-13"},
-  {id:"personal-1119", kind:"personal", from:"2026-11-19", to:"2026-11-20"},
+  {id:"personal-1120", kind:"personal", from:"2026-11-20"},
   {id:"feelssa-1123", kind:"feelssa", from:"2026-11-23"},
   {id:"feelssa-1222", kind:"feelssa", from:"2026-12-22"}
 ];
