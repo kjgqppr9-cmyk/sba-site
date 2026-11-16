@@ -852,6 +852,7 @@ const LECTURES = [
     sessions:[
       {date:"2026-11-18", n:1, title:"내 채널 콘텐츠를 AI 로 꾸준히 만드는 법 · AI 광고 제작 시연"}
     ],
+    time:"오후 2시 ~ 5시",
     hours:3, capacity:null, enrolled:0,
     rating:null, ratingCount:0,
     reviews:[],
