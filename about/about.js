@@ -207,7 +207,7 @@ window.__sbaAboutRun = function(bm){
         cards.forEach(function(c){ var b = c.querySelector('[data-n]'), at = 450 + slot*380; slot++;
           if(!b){ setTimeout(function(){ c.classList.add('hit'); }, at + 1600); return; }
           var to = parseInt(b.getAttribute('data-n'),10), dur = 1600;
-          setTimeout(function(){ var t0 = performance.now(); (function step(now){ var p = Math.min(1,(now-t0)/dur); b.textContent = Math.round(to*ease(p)); if(p<1) requestAnimationFrame(step); else { b.textContent = to; c.classList.add('hit'); } })(t0); }, at); });
+          setTimeout(function(){ var t0 = performance.now(); (function step(now){ var p = Math.min(1,(now-t0)/dur); b.textContent = Math.round(to*ease(p)); if(p<1) requestAnimationFrame(step); else { b.textContent = to; b.style.minWidth = ''; c.classList.add('hit'); } })(t0); }, at); });
       };
       var sio = new IntersectionObserver(function(es){ if(es.some(function(e){ return e.isIntersecting; })){ sio.disconnect(); play(); } }, {threshold:0.35});
       sio.observe(stats);
