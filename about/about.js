@@ -193,8 +193,25 @@ window.__sbaAboutRun = function(bm){
     var cta = root.querySelector('.abx-cta'), ch = cta && cta.querySelector('.cta-hex');
     if(cta && ch && !ch.__on){ ch.__on = true; startHexGold(cta, ch); }
     var why = root.querySelector('.abx .why'); if(why && !why.__live){ why.__live = true; if(window.IntersectionObserver){ new IntersectionObserver(function(es){ why.classList.toggle('live', !!(es[0] && es[0].isIntersecting)); }, {threshold:0, rootMargin:'120px 0px'}).observe(why); } else { why.classList.add('live'); } }
-    var stats = root.querySelector('.abx-num .stats');
-    if(stats && !stats.__re && window.IntersectionObserver){ stats.__re = true; new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ stats.querySelectorAll('[data-n]').forEach(function(b){ if(!b.__run){ b.__done = false; if(window.__abxCount) window.__abxCount(b); } }); } }); }, {threshold:0.5}).observe(stats); }
+    /* 실적 숫자 줄 (2026-11-19): 화면에 들어올 때 한 번만. 카드 등장은 [data-rv] 가 120ms 스태거로,
+       숫자는 easeInOutCubic 1.6초 — 첫 카드 0.45초, 둘째 카드 0.83초에 시작(380ms 엇갈림).
+       끝나면 .hit(펄스·단위 팝·금빛 광택), 글자 카드 두 장은 그 뒤 380ms 박자로 광택만. 동작 줄이기 설정이면 최종 숫자 그대로 */
+    var num = root.querySelector('.abx-num'), stats = num && num.querySelector('.stats');
+    var rdc = false; try{ rdc = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+    if(stats && !stats.__re && !rdc && window.IntersectionObserver){ stats.__re = true;
+      var cards = [].slice.call(stats.querySelectorAll('.stat'));
+      cards.forEach(function(c){ var b = c.querySelector('[data-n]'); if(b){ b.__done = true; b.style.minWidth = String(parseInt(b.getAttribute('data-n'),10)).length + 'ch'; b.textContent = '0'; } });
+      num.classList.add('anim');
+      var ease = function(p){ return p<.5 ? 4*p*p*p : 1-Math.pow(-2*p+2,3)/2; };
+      var play = function(){ var slot = 0;
+        cards.forEach(function(c){ var b = c.querySelector('[data-n]'), at = 450 + slot*380; slot++;
+          if(!b){ setTimeout(function(){ c.classList.add('hit'); }, at + 1600); return; }
+          var to = parseInt(b.getAttribute('data-n'),10), dur = 1600;
+          setTimeout(function(){ var t0 = performance.now(); (function step(now){ var p = Math.min(1,(now-t0)/dur); b.textContent = Math.round(to*ease(p)); if(p<1) requestAnimationFrame(step); else { b.textContent = to; c.classList.add('hit'); } })(t0); }, at); });
+      };
+      var sio = new IntersectionObserver(function(es){ if(es.some(function(e){ return e.isIntersecting; })){ sio.disconnect(); play(); } }, {threshold:0.35});
+      sio.observe(stats);
+    }
     return true;
   }
   if(!boot()){ var tries=0; var timer=setInterval(function(){ if(boot() || ++tries>200) clearInterval(timer); }, 50); }
